@@ -1,0 +1,403 @@
+PASOS DE DERIVACION
+-------------------
+
+1.- Diseñar el invariante y la condicion sabiendo que
+    I and not B -> Q
+2.- Diseñar A0 para que {P} A0 {I}
+
+3.- Diseñar C, tal que I  -> C>= 0
+
+4.- Diseñar A1 : Avance y pmd(A1,I), tal que C decrece.
+
+5.- Diseñar A2 : Restaurar de I and b a pmd(A1,I)
+
+
+
+
+
+3) Temperatura.
+
+/*
+  Extreme temperatures.
+
+  P : N >= 0
+  Q : p = #i : 1 <= i < N-1 : V[i-1]<V[i]>V[i+1]
+      v = #i : 1 <= i < N-1 : V[i-1]>V[i]<V[i+1]
+
+0                 n            N
++-----+-----+-----+-----+-...-+
+|  34 |  23 |  14 |   56|     |
++-----+-----+-----+-----+-...-+
+
+I : Q[N-1/n] :
+     1 <= n <= N-1
+   : p = #i : 1 <= i < n : V[i-1]<V[i]>V[i+1]
+     v = #i : 1 <= i < n : V[i-1]>V[i]<V[i+1]
+
+B : n < N - 1
+
+C(n) : N - n >= 0 
+
+Init:
+-----
+    n, p, v = 1, 0 , 0
+    
+Step:
+-----
+
+   n = n + 1
+
+Restore:
+--------
+
+   p = p + \chi(V[n-1]<V[n]>V[n+1]);
+   v = v + \chi(V[n-1]>V[n]<V[n+1]);
+
+   Intuition:
+   ----------
+
+   Check if V[n-1]<V[n]>V[n+1] // Safe; why?
+   Check if V[n-1]>V[n]<V[n+1] // Safe; why?
+
+   Algebra:
+   --------
+     I and B -/-> I[n/n+1]
+
+     1 <= n <= N-1
+   : p = #i : 1 <= i < n : V[i-1]<V[i]>V[i+1]
+     v = #i : 1 <= i < n : V[i-1]>V[i]<V[i+1]
+
+     -/->
+
+     1 <= n+1 <= N-1
+   : p = #i : 1 <= i < n+1 : V[i-1]<V[i]>V[i+1]
+     v = #i : 1 <= i < n+1 : V[i-1]>V[i]<V[i+1]
+
+
+
+Pseudocode:
+----------
+     n, p, v = 1, 0 , 0
+     while (n<N-1)
+       p = p + \chi(V[n-1]<V[n]>V[n+1]);
+       v = v + \chi(V[n-1]>V[n]<V[n+1]);       
+       n= n+ 1
+     done
+
+
+The solution, as a tributte to C/C++, can be
+
+void extreme(const int V[],const N, int &p,int &v)
+{
+  int n;
+  for(n=1,p=v=0;n<N-1;n++)
+  {
+    p+= (V[n-1]<V[n] && V[n]>V[n+1])
+    v+= (V[n-1]>V[n] && V[n]<V[n+1])
+}
+
+
+
+ESQUEMAS DE DERIVACION TIPICOS.
+------------------------------
+
+4) decimal.
+
+
+a) Variables acumuladoras para evitar bucles anidados.
+------------------------------------------------------
+
+
+{ P: N>= 0 and \forall j : 0 <= j < N : v[j] \in {0.1} }
+fun decimal(int V[],int n) return int d
+{ Q: d = sum : 0 <= j < N: v[j]*2^j }
+
+Ojo!, los de más peso están a la derecha!!!
+
++-----+-----+-----+-----+-----+
+|  1  |   1 |  0  |  1  |  1  |
++-----+-----+-----+-----+-----+
+  
+
+
+
+Planteamos:
+
+1) 
+  I:Q[N/n]: d = sum : 0 <= j < n: v[j]*2^j and 0 <= n <= N
+  B: n < N
+
+
+   Vemos que I and not B -> Q .
+
+2) A0:
+     d,n= 0, 0
+     
+   Es obvio que P-> I[d/0][n/0]
+
+
+3)  C(n)=N-n ya que I  -> N-n >= 0
+
+4) A1:
+     n = n + 1 
+
+    I[n/n+1]:d = sum : 0 <= j < n+1: v[j]*2^j and 0<=n+1<=N
+
+5) A2:
+
+    I and B : d = sum : 0 <= j < n: v[j]*2^j and  n < N
+
+    -/->
+
+    I[n/n+1]:d = sum : 0 <= j < n+1: v[j]*2^j and 0<=n+1<=N
+
+
+   Se ordena restuarar d...
+    d = sum : 0 <= j < n: v[j]*2^j + v[n]*2^n
+
+   !! Problema: el calculode 2^n es en O(n), luego todo el
+   bucle estaria en O(n^2)
+
+   Solucion: Anadimos p=2^n al invariante que queda...
+
+   d = sum : 0 <= j < n: v[j]*2^j and 0 <= n <= N and p=2^n
+
+   Revisamos A0,A1 y A2
+
+   A0):
+     d,n,p= 0, 0,1
+   A1):
+        n=n+1
+   A2):
+        Tenemos que restaurar d y p 
+        d, p  = d + v[n]*p , 2*p
+
+6) Efectivamente { I and B and N-n=T} A0;A1 {N-n<T}
+
+
+El resultado queda:
+
+    d,n,p=0,0,1
+    while n < N
+       d, p = d+v[n]*p , 2*p
+       n=n+1
+
+Que esta en O(n)
+
+/* Tribute to C/C++ */
+
+    for(d=n=0, p=1; n<N; n++)
+    {
+       d+=p*V[n];
+       p <<=1;
+    }
+
+b) Moda en tiempo lineal O(n)
+-----------------------------
+
+{ P : V[0..N) and sorted(V[0..N) and N > 0 }
+fun mode(V[0..N) of int) dev m : int
+{ Q : m = max i : O <= i < N : frec(V[i],V,0,N)}
+
+
+
+(Short step)
+------------
+
+0           --m=eq=2--  n           N
++-----+-----+-----+-----+-----+-...-+
+|  1  |  2  |  3  |  3  |  4  |     |
++-----+-----+-----+-----+-----+-...-+
+
+I ::= Q[N/n]
+   m = max i : O <= i < n : frec(V[i],V,0,n)}  and 1<=n<=N
+
+   and
+
+   eq = max i : O <= i < n and AllesEq(V,i,n) : n-i }  and 1<=n<=N **
+
+**Efficiency reasons...
+
+
+Init:
+-----
+A0 : n,m,eq = 1,1,1
+
+
+Step:
+-----
+
+A1 : n = n + 1
+
+Restore:
+--------
+A2: restore  (why?)  (formula development in board)
+
+Intuition)
+
+
+    case V[n]==V[n-1]
+        eq = eq + 1
+    e.o.c
+        eq = 1
+    m = max(m,eq)
+	
+Algebra) Purely equtional... no assignments...
+
+eq = max i : O <= i < n+1 and AllesEq(V,i,n+1) : n+1-i }
+
+ = (max i : O <= i < n and AllesEq(V,i,n) : n-i)   + 1  si V[n]==V[n-1]
+ = 1    V[n]!=V[n-1]
+
+m = max i : O <= i < n+1 : frec(V[i],V,0,n+1)
+  = max(max i : O <= i < n : frec(V[i],V,0,n),eq)
+
+
+El algoritmo quedaria
+
+  n,eq = 1, 1
+  while n<N do
+    case V[n]==V[n-1]
+        eq = eq + 1
+    e.o.c
+        eq = 1
+    m = max(m,eq)
+    n=n+1
+  done
+
+
+// C-flavour...
+  for(n=eq=1; n<N; n++)
+     eq = 1 + (V[n]==V[n-1])*eq
+     m = max(m,eq)
+
+Long step: (harder...)
+-----------------------
+
+0                       n           N
++-----+-----+-----+-----+-----+-...-+
+|  1  |  2  |  3  |  3  |  4  |     |
++-----+-----+-----+-----+-----+-...-+
+
+I : m = max i : O <= i < n : frec(V[i],V,0,N)}  and 1<=n<=N
+    and (n<N -> V[n]!=V[n-1])
+
+
+B : (n<N)
+
+Init :
+   m = max i : 0 <= i <= N and AllesEq(0,i,=) : i
+   n = m
+
+Step :
+   let
+      s = max i : n <= i <= N and AllesEq(n,i,=) : i
+   in
+      n = n + (s-n)  // i..e n=s at least s=1
+
+Restore:
+   let
+      s = max i : n <= i <N and AllesEq(n,i,=) : i
+   in
+      m = max(m, s-n)
+
+Pseudocode:
+-----------
+   m = max i : 0 <= i < N and AllesEq(0,i,=) : V[i]=V[0]
+   n = m
+   while (n<N)
+      let
+        s = max i : n <= i <=N and AllesEq(n,i,=) : i
+      in
+        m = max(m, n-s)
+        n = s
+   done
+   return m
+
+   n=1
+   while n<N and V[n]=V[0]
+      n = n + 1
+   m = n
+   while (n<N)
+   	s=n+1
+	while s<N and V[s]=V[n]
+           n = n + 1
+        m = max(m, n-s)
+	n = s
+   done
+   return m
+
+
+Cual es la complejidad?
+
+
+en C:
+
+   for(n=1;n<N and V[n]=V[0];n++);
+   for( ;n<N;n=s)
+   {
+      for(s=n+1;n<N and V[s]=V[n];s++);
+      m = max(m,n-s);
+   }
+
+
+
+c) Problemas de segmentos de longitud maxima... (Hard)
+-----------------------------------------------
+
+Es un _esquema_ DIFICIL de derivar pero que una vez comprendido
+facilita la resolucion de algunos problemas en O(n)
+
+Mirar demostracion en Bibliografia...
+
+{ N>=0 }
+fun seg-lon-max(V[0..N) de ent) dev r: int
+{ r= max p,q: 0 <= p <= q <= N and Alles(p,q) : q - p }
+
+donde Alles(p,q) es una propiedad que cumple A[p..q)
+y DEBE SER
+   + cerrada por izquierda:
+      * si un segmento cumple, prefijos tambien  o
+      * si los prefijos no lo cumplen, el segmento tampoco.
+   + cerrada por derecha:
+      * si un segmento cumple, sufijos tambien o
+      * si los sufijos no lo cumplen, el segmento tampoco.
+    
+
+El esquema que lo resuelve, _sin demostrar_, es
+
+I : 0 <= n <= N and r = (max p,q: 0 <= p <= q <= n and Alles(p,q):q-p)
+    and s= min p : 0 <= p <= n and Alles(p,n) : p
+
+n,r,s = 0, 0 , 0
+while n<N do
+   {Alles(s,n)}
+    ???
+   {Alles(s,n+1)}
+   r = r max(n+1-s)
+   n = n + 1
+end
+
+Por ejemplo:
+
+b.1) Secuencia maxima de elementos iguales a 0.
+    Alles(s,n): \forall i: s <= i < n : V[i]==0
+
+    Alles(s,n+1) ?
+        si V[n]==0 , sigue valiendo s.
+	si V[m]!=0, por ser cerrada por la derecha s=n+1.
+
+b.2) Secuencia maxima de elementos iguales.
+     Alles(s,n): \forall i: s <= i < n : V[i]==V[s]
+
+    Alles(s,n+1) ?
+        si V[n]==V[s], sigue valiendo s.
+	si V[n]!=V[s], por ser cerrada por la derecha s=n.
+
+b.3) Secuencia maxima de elementos estrictamente crecientes
+     Alles(s,n): \forall i: s <= p < j < n : V[p]<V[s]
+
+    Alles(s,n+1) ?
+        si V[n-1]<V[n], sigue valiendo s.
+	si V[n-1]>=V[s], por ser cerrada por la derecha s=n.
+

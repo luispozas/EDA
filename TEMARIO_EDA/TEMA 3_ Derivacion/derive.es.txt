@@ -1,0 +1,361 @@
+DERIVACIÓN DE ALGORITMOS:
+-------------------------
+
+SINTESIS: (repaso verficación)
+--------
+
+
+     *{I and B and C = T}   S  { C < T }
+     ** I and B -> C >= 0 
+{ I and B} S { I }  I and not B -> Q
+-----------------------------------------------
+           { I } while B do S { Q }
+
+- Correccion parcial ~ I
+          " Si acaba, acaba bien"
+- Terminacion(*,**)  ~ C
+          " Acaba "
+
+PLANTILLA PARA LA DERIVACIÓN DE ALGORITMOS:
+------------------------------------------
+
+Dijsktra revisa los trabajos de Hoare y formula
+una _estrategia_ para poder construir programas correctos.
+La prueba de corrección _total_ se genera al tiempo que se construye.
+
+{P}
+A0: Init
+{I}
+while (B): { I and B}
+   A2: Restore
+   A1: Step
+{Q}
+
+
+Variante:
+--------
+
+{P}
+A0: Init
+{I}
+while (B): { I and B}
+  B1
+   A12: Restore
+   A11: Step
+  B2
+   A22: Restore
+   A21: Step   
+{Q}
+
+
+ESTRATEGIA pmd :  Dados I y C(n)
+-----------------
+
+                 Corrección parcial			
+		 -------------------
+		 P -> pmd(A0,I)
+		 I and B -> pmd(A1;A2,I)			
+		 I and not B -> Q			
+		 					
+		 					
+		 Terminacion				
+		 -----------				
+		 I  -> C(n) >= 0			
+		 I and B and C(n)=T --> pmd(C(n)<T,A1;A2)
+
+
+
+
+(Conexion con Teoria de Funciones Recursivas-Computables)
+
+
+La clave : Escoger I y función de cota C.
+------------------------------------------
+
+ESTRATEGIAS:
+-------------
+
+   Para I:
+   ------
+   - "Parecido" a Q, pero "próximo" a P.
+     	- Tal "parecido" a Q que I and not B -> Q
+	- Tal "próximo" a P que A0 no sea _complicado_.
+
+      Algunas guias...No esperes trucos...:-( Algún dibujo ayuda)
+          - eliminar conjuncion.
+	        Q: Q1 and Q2  . Una puede ser I, la otra not B.
+	  - incorporar variable (n).
+	       I : Q[\phi(x)/n]
+	       tal que I and (n=\phi(x)) -> Q
+	       (Veremos ejemplos)
+
+   Para C(n)
+   ---------
+     - Algo que nos de idea de como decrece el numero de
+   vueltas(tamaño)
+
+
+
+   (Caso especial: vectores.)
+   	 Un dibujo suele ilustrar mucho
+
+   (Caso especial: aritméticos)
+         Conviene saber teoremas que relacionen P y Q
+
+METODO:
+-------
+     - Una vez definido I , not B and C(n), todo es _casi_ mecanico.
+     
+     1.- Escribimos A0.
+     2.- Escribimos A1. *****
+     3.- Escribimos A2. Normalmente, no tenemos I and B -> pmd(I,A1).
+         La logica nos dice como implementarlo.
+
+
+**** MUY IMPORTANTE: varsRead(A1) \intersect varsWrite(A2) = \empty !!!!!
+
+EJEMPLOS:
+----------
+
+0)  Conteo de los elementos pares (Facil)
+
+    {P: N>=0}
+    fun odds(V[0..N) of int) dev m:int
+    {Q: m=#i:0<=i<N:(V[i]%2==0) }
+
+0      n                                         N-2  N-1    N
++-...-+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|     |  12 |  11 |  5  |  4  |  4  |  2  |  3  |  1  |  0  |
++-...-+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+
+
+    Ensayamos:
+    
+    * I:Q[N/n]:m=#i:n<=i<N:(V[i]%2==0) and 0<=n<=N
+    
+    * !B:n=0 , i.e B:n>0  (why?)
+
+    * C(n)=n
+
+    Vemos que I and not B -> Q, e I -> C(n)>=0  (bla, bla...)
+
+    1.- A0 : m,n=0,N , lo cual hace cumplir I
+
+    (0=#i:N<=i<N:(V[i]%2==0) and 0<=N<=N
+
+    2.- A1 : n = n - 1, lo que hace decrementar C(n)
+
+    3.- A2???
+        Intuición.
+        ---------
+	if (V[n-1]%2==0)
+	       m=m+1
+
+	Algebra (Explicación)
+        ---------------------
+        Que ocurre con I and B?
+
+	Vemos que I and B -/-> I[n/n-1]
+	
+	m=#i:n<=i<N:(V[i]%2==0) and 0<=n<=N and n>0  -/-> 
+
+	m=#i:n-1<=i<N:(V[i]%2==0) and 0<=n-1<=N
+
+(Ejemplo: n = N-5)
+0                             n                  N-2  N-1    N
++-...-+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|     |  12 |  11 |  5  |  4  |  4  |  2  |  3  |  1  |  0  |
++-...-+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+
+
+	Tenemos que restaurar...
+
+	Nada para 0 <= n- 1 <= N ... por que?
+
+	m=#i:n<=i<N:(V[i]%2==0) + \chi(V[n-1]%2==0)  ***
+
+	Nos dice que m debe incrementarse en 1 si V[n-1]%2==0
+
+	A2: if (V[n-1]%2==0)
+	       m=m+1
+
+     *** \chi(true)=1
+         \chi(false)=0
+
+	 El resultado es:
+
+	 A0 : n,m=N,0
+	 while (n>0) :
+	    A2: if (V[n-1]%2==0)
+	           m=m+1
+            A1: n=n-1
+
+	 que, puesto con un C-flavour, queda:
+
+	 for(n=N,m=0; n ; n--)
+	     m+=(V[n-1]%2==0)
+
+2) Otra manera (mas artificiosa)
+
+0                       n     m                              N
++-----+-----+-----+-----+-...-+-----+-----+-----+-----+-----+
+|  1  |  12 |  11 |  5  |     |  4  |  2  |  3  |  1  |  0  |
++-----+-----+-----+-----+-...-+-----+-----+-----+-----+-----+
+
+    {P: N>=0}
+    fun odds(V[0..N) of int) dev m:int
+    {Q: k=m1 + m2 ,
+        donde m1 = #i:0<=i<n:(V[i]%2==0)
+	      m2 = #i:m<=i<N:(V[i]%2==0)
+	      n=m
+     }
+
+I : 0 <= n <= m <= N and
+    m1 = #i:0<=i<n:(V[i]%2==0) and
+    m2 =#i:m<=i<N:(V[i]%2==0)
+
+!B: (n==m), luego  B: (n<m)
+
+C(m,n) = m - n >= 0 
+
+n,m,m1,m2 = 0,N,0,0
+while (n<m)  
+   m1 = m1 + \chi(V[n]%2==0)
+   m2 = m2 + \chi(V[m-1]%2==0)   
+   n,m = n+1 , m-1
+done
+return m1+m2
+
+correcto?????  Supongamos...
+
+0     n      m    N
++-----+-----+-----+
+|  1  |  2  |  2  |
++-----+-----+-----+
+
+Da 3 numeros pares!!!
+
+por que esta mal?
+imaginemos n=m-1, por lo que n<m
+entonces, al avanzar en 1 en cada lado, m<n!! contra el invariante!
+
+Recurramos al esquema 2:
+
+n,m,m1,m2 = 0,N,0,0
+while (n<m)
+   case m-n > 1 
+      m1 = m1 + \chi(V[n]%2==0)
+      m2 = m2 + \chi(V[m-1]%2==0)   
+      n,m = n+1 , m-1
+   e.o.c
+      m1 = m1 + \chi(V[n]%2==0)
+      m = m+1
+done
+return m1+m2
+
+
+(Observad que se puede reducir al 1 esquema.
+Un poco más..."ilegible")
+
+n,m,m1,m2 = 0,N,0,0
+while (n<m)  
+   m1 = m1 + \chi(V[n]%2==0)
+   m2 = m2 + \chi( n<m-1 and V[m-1]%2==0)   
+   n,m = n+1 , m-1*\chi(n<m-1)
+done
+return m1+m2
+
+
+/* Pasar a C es trivial... 
+  Feel free for while/for .*/
+for(n=m1=m2=0,m=N; n<m ; n++,m-(n<m-1))
+{
+    m1+=(V[n]%2==0)
+    m2+= (n<m-1) &&  (V[m-1]%2==0)
+}
+
+
+1) Division entera (Dificil)
+
+Basado en un teorema clásico de Divisibilidad.
+
+Dice que
+
+para todos a,b existen c,r tales que
+
+a = b*c + r   0 <= b < r
+  
+ r       b          b         b         b    
+|---||--------||--------||--------||--------| = a
+
+
+
+{ P : a >= 0, b> 0 }
+fun division(int a, int b) dev <int c,int r>
+{ Q: a=c*b + r and 0<= r < b }
+
+    Ensayamos:
+    
+    * I: a=c*b + r and 0<=r
+    
+    * !B: r< b , luego B: r>= b
+
+    * C(n)= r
+
+    Vemos que I and not B -> Q
+    
+    I : a=c*b + r and 0<=r and r<b -> Q
+
+    Y que I and B -> r >= 0
+
+    1.- A0 : c,r = 0,a, lo cual hace cumplir I
+
+    2.- A1 : r=r-b  
+
+    3.- A2???
+        Intuicion:
+	---------
+	   Sumar 1 al valor del cociente.
+
+	Algebra:
+	-------
+        Que ocurre con I and B?
+
+	Vemos que I and B -/-> I[r/r-b]
+
+	a=c*b + r and 0<=r and r>=b -/-> 
+
+	a=c*b + (r-b)) and 0<=r
+
+	Tenemos que restaurar...
+
+	Nada para 0 <= r ... por que?
+
+	a=c*b + (r-b) + b, o lo que es lo mismo
+
+	a=c*b + b + (r-b) =(c+1)*b + (r-b))
+
+	Nos dice que c debe incrementarse en uno !!!
+
+	 El resultado es:
+
+	 A0 : c,r = 0,a
+	 while (r>=b) :
+	    A2: c = c + 1
+            A1: r = r - b
+
+	 que, puesto con un C-flavour, queda:
+
+	 for(c=0,r=a; r>=b ; r-=b) c++ ;
+
+
+VENTAJAS y DESVENTAJAS:
+----------------------'
+  - Los programas derivados quedan muy simples,
+  - Son correctos por construcción, no conjeturas...
+  - Es como una inversión: se tarda al principio, pero con el tiempo
+    superan a "los tests"...
+
+  - Ser informal en lo obvio pero riguroso en lo complejo.

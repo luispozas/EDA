@@ -1,0 +1,142 @@
+Definicion recursiva del lenguaje
+---------------------------------------------
+(No abarca todo el C, pero si un conjunto significativo)
+
+s ::=   skip | x := 3 | S1 ; S2
+        |  if B then S1 else S2
+        |  while B S1
+
+Ejemplos de programa:
+
+ x := 3 ;
+ while x < 3 
+    y := 5 + 4
+ x = x + y
+
+
+HOARE TUPLE:
+------------
+{ P } S { Q }
+
+Se lee... "Si empezamos en P despues de
+           hacer S vamos a Q"
+
+
+IDEA:  Justificar la intuición
+       que tenemos sobre el comportamiento
+       de un programa.
+
+
+CALCULO HOARE:
+-------------
+
+--------------------SKIP   -------------------------ASSIG
+  { P } skip { P }            {P[x/e]} x = e { P }
+
+
+
+{ P } S1 { Q1 },  {Q1} S2 { R }
+-------------------------------- SEQ
+{ P } S1 ; S2 { R }
+
+
+
+{ P and B } S1 { Q } ,  {P and not B} S2 { Q }
+---------------------------------------------- IF
+{ P } if B then S1 else S2 { Q }
+
+
+     *{I and B and C = T}   S  { C < T }
+     ** I and B -> C > 0 
+{ I and B} S { I } , I and not B -> Q
+-----------------------------------------------
+           { I } while B do S { Q }
+
+
+P -> P' , {P'} S { Q }         {P} S {Q'} , Q' -> Q
+---------------------STREN     --------------------WEAK   
+{ P } S { Q }                   { P } S { Q }
+
+
+
+
+* y ** se vinculan con la terminación propiamente,
+El resto, con la corrección parcial.
+
+
+
+
+
+Demostracion de { P } S { Q } (una tupla Hoare cualquiera}
+------------------------------------------------------
+Sucesion de formulas, cada una axioma o inferida a partir
+de las otras
+
+
+
+Ejemplos
+
+??  { x = 5 } skip { x = 5 }
+
+    1:  {P: x = 5 } skip {P: x = 5 }  Skip
+
+??  { P':x = 5 and y = 4} skip { P:x = 5 }
+    1: {P: x = 5 } skip {P: x = 5 }  Skip
+    2:  P': x = 5 and y = 4  -> P:x = 5 
+    3: {P': x = 5 and y = 4} skip { P: x = 5 } Strength(1,2)
+
+??  { x = 5 } x := x + 1 { x = 6 }
+
+  1: {P[x/x+1]: x + 1 = 6 } x := x + 1 { P: x = 6 } Assign
+
+
+??  { x = 5 and y = 1 } x := x + 1 ; y = y + 3 { x = 6  and y = 4 }
+
+
+  1: {Q[y/y+3]:x=6 and y+3=4} y=y+3  {Q:x = 6 and y = 4 } ASSIGN
+  2: {Q[y/y+3][x/x+1]:x+1=6 and y+3=4}x=x+1{Q[y/y+3]:x=6 and y+3=4 } ASSIGN
+  3: {P: x+1=6 and y+3=4} x=x+1;y=y+3 {Q:x = 6  and y  = 4 } SEQ(1,2)
+
+?? { x = 5 } if (x < 6 ) then x = 9 else x= 10 { x <= 11 }
+
+
+  1: {P[x/10]: 10 <= 11 } x = 10 {P: x<= 11 }  SKIP
+  2: P''': x = 5 and notB:x >= 6 -> P[x/10]:10 <= 11  
+  3: {P''': x = 5 and notB:x >= 6 } x = 10 {P x <= 11 } STREN(1,2)
+  4: {P[x/9]: 9 <= 11 }   x = 9  {P: x <= 11 }  ASSIGN
+  5:  P'': x=5 and B:x < 6 -> P[x/9]:9 <= 11
+  6: {P''': x=5 and B:x < 6 }   x = 9  {P: x <= 11 } STREN(4,5)
+  7: {P''':x = 5 } if (x < 6 ) then x = 9 else x= 10 {P: x <= 11 } IF(3,6)
+
+
+?? { x = 5 } if (x < 6 ) then x = 9 else x= 10 { x <= 10^9 }
+
+  1: (...)  Same
+  N: { P: x = 5 } if (x < 6 ) then x = 9 else x= 10 { Q :x <= 11 } IF(...)
+  N+1: Q: x <= 11 -> Q':x <= 10^9
+  N+2: {P:x = 5 } if (x < 6 ) then x = 9 else x= 10 {Q': x <= 10^9 } WEAK(N,N+1)
+     
+?? { x = 0 } while x < 2 do x = x + 1 { x = 2}
+
+(Correccion Parcial)
+
+  1: {I[x/x+1]: 0 <=  x + 1 <= 2 } x = x+ 1 {I: 0 <= x <= 2 } ASSIGN
+  2: B:x < 2 and I:0 <= x <= 2 -> I[x/x+1]: 0 <= x + 1 <= 2
+  3: { B:x < 2 and I:0 <= x <= 2 } x = x + 1 { I:0 <=x <= 2 } STREN(1,2)
+  4: I: 0 <= x <= 2 and notB:x >= 2  ->  x = 2 
+  5: {I: 0 <= x <= 2 } while x < 2 do x = x + 1 { x = 2 } WHILE(3,4)
+  6: x=0 -> I: 0 <= x <= 2
+  7: {x=0} while x < 2 do x = x + 1 { x = 2 } STREN(5,6)
+  
+     
+(Terminación) Sea C(x)=2-x >= 0 
+
+  1: I:x<=2 and B:x<2 -> 2-x > 0  **
+
+
+  1: {Q[x/x+1]:2-(x+1) < T}  x=x+1{Q:2-x < T}  ASSIGN
+  2: I:x<=2 and B:x<2 and 2-x=T  -> Q[x/x+1]:2-x-1) < T
+  3: {I:x<=2 and B:x<2 and 2-x=T} x=x+1 {Q: 2-x<T} STREN(1,2) *
+  
+
+  

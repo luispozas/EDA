@@ -1,0 +1,73 @@
+Intro:  "El fracaso de la algoritmia"
+------------------------------------
+
+Arboles de exploración y fuerza bruta:
+
+(Un dibujo del arbol de exploración de soluciones)
+
+
+Dos modalidades:
+  - Busqueda en profundidad (pilas,BackTracking)  <====== 2 EDA
+  - Busqueda en anchura     (colas, Branch and Prunning, ) <=== 3 MARP
+
+En general, se intenta detectar las ramas que no conducen a solución
+mediante dos funciones.
+
+  - esValida . (Puede formar parte de solucion)
+  - es completable (_algun hijo_ que puede formar parte de solucion)
+
+NOTA: no completable(nodo) -> no valida(nodo.hijo)
+
+pero
+
+      completable(nodo) -/-> valido(nodo.hijo)
+
+(Es preferible programar valida)
+
+Esquema general.
+----------------
+
+Libro "Estructuras de Datos y Algoritmos. Ejercicios resueltos"
+Narciso et al. pag. 456.
+
+
+
+proc backTracking(sol : tupla, k : nat)
+   preparar-recorrido-nivel(k)
+   while not ultimo-nivel(k) do
+      sol[k] = siguiente-hijo-nivel(k)
+      si es-valida(sol,k]) then  <=== ojo, al coste!
+        si es-solucion(sol,k) then
+          tratar_solucion(sol,k)
+        si no
+          si es completable(sol,k+1) entonces <== ojo al coste!
+	     backTracking(sol, k+1)
+	  fsi
+     fsi
+   done
+
+
+Esquema general con marcadores:
+-------------------------------
+
+
+// P : completable(sol,k)
+proc backTracking(sol : tupla, k : nat, m: marcador)
+   preparar-recorrido-nivel(k)
+   while not ultimo-nivel(k) do
+      sol[k] = siguiente-hijo-nivel(k)
+      si es-valida(sol,k,m) then     <=== Mas eficaz en T.
+         m = marcar(m,sol[k])  <=== ojo!
+         si es-solucion(sol,k) then
+            tratar_solucion(sol,k)
+         si no
+          si es completable(sol,k+1,m) entonces <== Mas eficaz en T.
+	     backTracking(sol, k+1)
+	  fsi
+	 fsi
+         m := desmarcar(m,sol[k])  <== ojo!
+     fsi
+   done
+
+
+

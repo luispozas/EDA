@@ -1,0 +1,102 @@
+8) Binary search  on (log(N))
+-------------------------------
+
+(N>=0) losses generality...
+
+P : N>= 0 and sorted(V,0,N)
+fun binSearch(V[0..N) of int, int val) returns b : bool 
+Q: 0 < max i,j:0<=i<=j<=N and (j>i)->V[(i+j)/2]=val:(j-i)
+
+Q* : b = \exists p : 0 <= p <= N : V[p]==v
+
+(Q* is _logically_ equivalent, but _computationally_ helpless)
+
+
+
+i=0         half              j=N-(N-j)         N-2   N-1   N
++-----+-...-+-----+-...-+-----+-----+-----+-----+-----+-----+
+|  1  |     |  7  |     |  13 |  16 |  22 |  25 | 36  | 42  |
++-----+-...-+-----+-...-+-----+-----+-----+-----+-----+-----+
+
+
+I : Q[0/i,N/j] and
+    AllesLess(V,0,i,val)
+    AllesGt(V,j,N,val)
+    0 <= i <= j <= N
+
+!B : (i==j) || V[(i+j)/2]==val
+
+B : (i<j) && V[(i+j)/2]!=val
+
+C(i,j)= j-i >= 0 
+
+
+Init :
+------
+
+   i,j = 0, N
+
+Restore-Step :
+-------------
+
+     case
+       V[(i+j)/2]>val :
+          skip;
+          j = j - (j-(i+j)/2);  // i.e j=(i+j)/2
+       V[(i+j)/2]< val :
+          skip;
+          i = i + ((i+j)/2 + 1 - i) ;// i.e i=1+((i+j)/2)
+     esac
+
+// Decreases C(i,j)=j-i ?
+
+a)  i<j -> (j-(i+j)/2)>0  (Lemma)
+b)  i<j -> ((i+j)/2 + 1 - i)>0  (Lemma)
+
+
+Pseudocode: 
+----------
+
+  i,j = 0, N,
+  while (i<j) && V[(i+j)/2]!=val
+     case
+       V[(i+j)/2]>val :
+          skip;
+          j = (i+j)/2
+       V[(i+j)/2]< val :
+          skip;
+          i = 1+((i+j)/2)
+     esac
+  return (i<j); //i.e (j-i)>0
+
+
+Complexity:
+----------
+
+Every step, C(i,j) is reduced on half size.
+How many times can happen this...
+i.e   16, 8, 4, 2, 1    --> 4 = log(16)
+      31, 16, 8, 4, 2, 1  --> 5 = round(log(31))
+
+in general... log(N)
+
+
+int binSearch(const int V[], const int val)
+{
+  i=0;j=N
+  while ((i<j) && V[(i+j)/2]!=val)
+  {
+     if (V[(i+j)/2]>val) j = (i+j)/2;
+     else  i = 1+((i+j)/2)
+  }
+  return (i<j) //
+}
+
+// A jock for C...Somewhat "ireadable".
+int binSearch(const int V[], const int val)
+{
+  for(i=0,j=N; ((i<j) && V[(i+j)/2]!=val);
+  	       j -= (V[(i+j)/2]>val)*(i+j)/2,
+	       i+= (V[(i+j)/2]>val)*(1+((i+j)/2)) ; <= empty loop.
+  return (i<j) 
+}

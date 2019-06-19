@@ -1,0 +1,367 @@
+
+Otra version de segmentos de longitud maxima...
+-------------------------------------------------
+
+"La longitud maxima del subsegmento con todos sus
+componentes iguales"
+
+{ N>=0 }
+fun seg-lon-max(V[0..N) de ent) dev r: int
+{ r= max p,q: 0 <= p <= q <= N and AllesEq(p,q) : q - p }
+
+where AllesEq(p,q): \forall i : p <= i < q : V[p]=V[i]
+
+0           ------ r = 3 -----                              N
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|  1  |   2 | 3   |  3  |  3  |  4  |  7  |  10 |  10 | 11  |
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+
+Short step:
+-----------
+
+Invariant snapshot:
+--------------------
+
+0                     r=3    eq=1  n=6                      N
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|  1  |   2 | 3   |  3  |  3  |  4  |  7  |  10 |  10 | 11  |
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+
+I ::= Q[N/n] and 0 <= n <= N and
+    eq = max i : 0 <= i <= n and AllessEq(V,i,n): n-i **
+
+** Efficiency reason.
+
+!B n==N     B: n<N
+
+Init:
+----
+ r,n,eq = 0,0,0
+
+Step:
+-----
+  n = n + 1
+
+Restore:
+-------
+  r = max(r,eq) where
+
+  eq = max i : 0 <= i < n+1 and AllessEq(V,i,n+1): n+1-i
+
+i.e. To avoid O(N^2) we add tp the invariant...** and
+    restart the process...
+
+  Then , _prior_ to r we must
+  case n>0 and V[n]==V[n-1]:
+      eq = eq + 1
+  e.o.c
+      eq = 1
+
+
+The algorithm results:
+
+  r,n,eq = 0,0,0
+  while n<N
+    case n>0 && V[n]==V[n-1]
+      eq=eq+1
+    e.o.c
+      eq=1
+    r = max(r,eq)
+    n=n+1
+  done
+    
+
+// Tribute to C++
+
+for(n=r=eq=0; n<N ; n++)
+{
+   eq = 1 + (n && V[n]==V[n-1])
+   r = max(r,eq)
+}
+
+Long step (harder):
+------------------
+
+Invariant snapshot:
+--------------------
+
+0                             n=5
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|  1  |   2 | 3   |  3  |  3  |  4  |  7  |  10 |  10 | 11  |
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+
+
+I : Q[0/n] and 0 <= n <= N
+
+!B: n==0 , B : n > 0
+
+Quota(n) : n
+
+
+Init :
+-----
+  n, r = N , 0
+
+Step:
+--------
+   let
+     s = min i : 0 <= i < n and Alles(i,n) : i
+   in
+     n = n - (n - s) ; // i.e n=s
+   
+Restore:
+------
+   let
+     s = min i : 0 <= i < n and Alles(i,n) : i
+   in
+     r = max(r,n-s)
+
+Pseudocode:
+-----------
+  n, r = N , 0
+  while (n > 0)
+     let
+	s = min i : 0 <= i < n and Alles(i,n) : i
+     in
+     r = max(r,n-s) ;      
+     n = n - (n - s) ; // i.e n=s
+        
+  done
+
+
+refining Pseudocode:
+-------------------
+
+  n, r = N , 0
+  while (n > 0)
+     s = n - 1 ;
+     while s > 0 and V[s-1]=V[n-1]
+        s = s - 1
+     r = max(r,n-s) ;      
+     n = n - (n - s) ; // i.e n=s
+  done
+
+Complexity:
+-----------
+
+s>0 is the critical instruction.
+It is trivial it is executed an absolute number of times..
+
+(N-s0) + (s0 - s1 ) + ... + (sn - 0 ) = N
+
+It is O(n)!!
+
+C- version.
+-----------
+  for(n=N,r=0; n ; n = s)
+  {
+     for(s=n-1; s && V[s-1]==V[n-1]);s--);
+     r = max(r,n-s)
+  }
+
+
+7) Merge algorithm.
+
+  P : V[0..N) W[0..M) , N,M>=0
+      sorted(V,0,N) and sorted(W,0,M)
+  Q : \forall j : 0 <= j < N+M :
+                                frec(A[i],A,N+M)=frec(A[i],V,N)+frec(A[i],W,M)
+                                sorted(A,0,N+M)
+
+Snapshot Invariant:
+--------------------
+
+0       n           N   0               m    M
++---+---+---+---+-..+   +---+---+---+---+-..+
+| 0 | 1 | 4 | 5 |   |	| -3| -1| 0 | 2 |   |
++---+---+---+---+-..+   +---+---+---+---+-..+
+
+
+0                       n+m             N+M
++---+---+---+---+---+---+-..+---+---+---+
+| -3| -1| 0 | 0 | 1 | 2 |   |   |   |   |
++---+---+---+---+---+---+-..+---+---+---+
+
+  I ::= 
+      0 <= n <= N and
+      0 <= m <= M and
+      Q[N+M/n+m,N/n,M/m] and
+**    (n+m > 0 and n < N) -> (A[n+m-1] <= V[n]) and
+**    (n+m > 0 and m < M) -> (A[n+m-1] <= W[m])
+
+** Don't panic! It just says:
+"The element we just put is the minor on two branches"
+
+
+  !B : n+m==N+M   B: n+m < N+M
+
+  Quote:  C(n,m,N,M) = N+M - (n+m) >= 0
+
+
+
+  Init:
+  -----
+  n,m = 0,0,0
+
+
+  Step-Restore:
+  -------------
+       case
+        n == N :
+                   A[n+m]=W[m];
+	           m = m + 1 ;
+        m == M ||  V[n]<=W[m]: 
+		   A[n+m]=V[n];
+		   n = n + 1 ;
+        e.o.c    :
+		   A[n+m]=W[m];
+		   m = m + 1 ;
+     esac		       
+
+C(n,m)=N+M-(n+m) decreases in every case.
+
+TODO: Proof formally that Invariant keeps.
+
+     I and B => pmd(I,S0 ...)
+     I and B => pmd(I,S1 ...)
+     I and B => pmd(I,S2 ...)     
+
+  Pseudocode : 
+  -------------
+    n,m=0,0
+    while ((n+m) < N + M) do
+       case
+        n == N :
+                   A[n+m]=W[m];
+	           m = m + 1 ;
+        m == M ||  V[n]<=W[m]: 
+		   A[n+m]=V[n];
+		   n = n + 1 ;
+        e.o.c    :
+		   A[n+m]=W[m];
+		   m = m + 1 ;
+    done
+
+
+In C:
+
+  int n,m;
+  for (n=m=0; (n+m)<N+M; )
+    {
+    if (n==N)
+    {
+       A[n+m]=W[m] ;
+       m++;
+    }
+    else
+    if (m == M || V[n]<=W[m])
+      {
+      A[n+m]=V[n];
+      n++;
+      }
+    else
+    {
+       A[n+m]=W[m] ;
+       m++;
+    }
+    }
+  return ;
+
+
+
+
+6) Partition !
+-----------------
+
+ Dado un vector de enteros, poner a un lado los pares y a otro los
+ impares, los negativos, y los positivos, marcando el pivote (p)....
+
+Version formulada en general...  
+
+" Dado un vector, modificar sus contenidos para que antes de una
+posición queden los que cumplen P, y después los que no ".
+
+
+/*
+  Open Question: Makes sense for N=0?
+
+  P : V[0..N)=A[0..N) , N>0
+  fun partition(V[0..N)) returns p :integer;
+  Q : permut(V,A) and 0 <= p <= N and AllesLessEq(V,0,p) and AllessGt(V,p,N)
+
+  where
+
+  AllesLessEq(V,0,p ) ::= \forall i : 0 <= i < p : V[i]<=V[0]
+  AllesLessGt(V,0,p ) ::= \forall i : p <= i < N : V[i]>V[0]
+
+  I : 0 <= i <= j <= N and
+      permut(V,A) and AllessLessGt(V,0,i) and AllessGt(V,j,N)
+
+  !B : i==j , B : i < j 
+
+
+Snapshot Invariant:
+------------------
+
+0           i                 j            N
++-----+-----+-----+-...-+-----+-----+-----+
+| 10  |  3  |     |     |     |  20 |  15 |
++-----+-----+-----+-...-+-----+-----+-----+
+
+
+
+  Init:
+  -----
+  i,j = 0, N  
+
+  Restore-Step:  an eye! we progress on A, not on V
+  -------------
+  case A[i]<=A[0]
+      skip;
+      i = i + 1
+   eoc
+      V[j-1],V[i]=A[i],A[j-1]
+      j = j - 1 
+  esac
+
+  Quote:
+  ------
+  C(i,j) = j-i>=0; // Always decreases in either branch,
+
+  Pseudocode:
+  -----------
+  i,j = 0, N
+  while i<j
+  case A[i]<=A[0]
+      skip;
+      i = i + 1
+   eoc
+      V[j-1],V[i]=A[i],A[j-1]
+      j = j - 1 
+  esac
+  
+  
+int solve(int V[], const int N)
+{
+  int i, j;
+  i=0;j=N;
+  while (i<j)
+  {
+   if  (A[i]<=A[0])
+      i = i + 1;
+   else
+   {
+      swap(A[i],A[j-1]);
+      j = j - 1;
+   }
+  }
+  return i;
+}
+
+
+
+
+

@@ -1,0 +1,126 @@
+DISEÑO DE ALGORITMOS RECURSIVOS
+--------------------------------
+Dado {P} fun foo(x) {Q}
+
+* Analisis por casos.
+
+     +--------+----------+
+     |Trivial |Sol. trivi|
+     +--------+----------+
+     |No      |Sol no    |
+     |trivial |trivial   |
+     +--------+----------+
+
+     A veces es mas complejo.
+
+     +--------+----+---------------------------+
+     |        | B11| Solucion caso trivial 1   |
+     |  B1    +----+---------------------------+
+     |        | B12| Solucion caso no trivial 1|
+     +--------+----+---------------------------+
+     |        | B21|Solucion caso trivial 2    |
+     |  B2    +----+---------------------------+
+     |        | B22| Solucion caso no trivial 2|
+     +--------+----+---------------------------+
+
+* Tamaño decrece en los no triviales.
+     - Quota decrece
+
+* Todos los casos son cubiertos por P
+
+* Codificacion en LR/C
+     - P(suc(s))
+     - B1 xor ... xor Bn
+
+
+
+Tecnica:
+--------
+
+R1 . Analisis del caso recursivo (el mas general)  I
+
+R2 . Distinguir casos...                 tv and not tv
+
+R3 . Caso trivial
+
+R4 . Descomposicion recursiva. (funcioin sucesor)
+
+R5 . Función de acotación y teminación
+
+R6 . Llamada recursiva.
+
+R7 . Combinación
+
+R8.  Escritura del caso recursivo.
+
+
+
+EJEMPLO: lower_bound!
+--------
+O _esta_, o el sitio donde  _deberia_ estar. i.e
+
+Ojo!, puede ser que val \not in V[0..N)
+
+P : sorted(V[0..N)
+fun lowerbound(V,N,val) returns n : int
+Q : n = max i : 0 <= i <= N : AllesLess(V,0,i,val)
+
+0     1          N
++-----+-----+-----+
+| 3   |   5 |  6  |
++-----+-----+-----+ 
+
+val=4
+n = 1 , since Alles(V,0,1,4) and V[1]>=5
+
+
+[3,5,6] , 4 -> 1
+[3,4,6] , 3 -> 0
+[3,4,6] , 2 -> 0
+[3,4,6] , 5 -> 2
+[3,4,6] , 6 -> 2
+[3,4,6] , 7 -> 3
+[3,4,4] , 4 -> 1 !!
+[4,4,4] , 4 -> 0 !!
+[]      , 4 -> 0
+
+
+{ P'(x) : sorted(V), i<= j }
+fun binarySearchG(V[i..j),x) return n : int 
+{
+   case 
+      j-i <= 1 :  i 
+      j-i  >  1 : let
+                h=(i+j)/2
+	      in
+	        case
+		  V[h] >= x: binarySearch(V[i..h)) // an eye!
+		  V[h] < x : binarySearch(V[h..j))
+	        esac
+   esac
+}
+{ Q(x) : n = max k : i <= k <= j : AllessLess(V,i,k,val) }
+
+
+
+
+// Como lo paso a C ?
+
+int binarySearch(const int V[],const int len)
+{
+   return binarySearchG(V,0,len) // Note we are V[0..N)
+}
+
+int binarySearch(const int V[], const int i, const int j)
+{
+  if (j==i)
+    return i ;
+  else 
+    {
+      h=(i+j)/2;
+      if (V[h]>=x) return binarySearchG(V,i,h);
+      if (V[h]<x) return binarySearchG(V,h,j);
+    }
+}
+
+         

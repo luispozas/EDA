@@ -1,0 +1,148 @@
+ COMPLEJIDAD EN ALGORITMOS RECURSIVOS:
+----------------------------------------
+
+- Expresión de recurrencias.
+
+  Sustraccion
+  ------------
+
+           /
+           | c*n^k   si 0 <= n < b
+    T(n) = |
+           | aT(n-b) + c*n^k  si n >= b
+           \
+
+    Calculo de complejidad.
+
+           /
+           | Theta(n^{k+1})   si  a = 1
+    T(n)in |
+           | Theta(a^{n div b})   si a > 1 
+           \                              
+
+   Division
+   ---------
+
+           /
+           | c*n^k   si 1 <= n < b
+    T(n) = |
+           | aT(n/b) + c*n^k  si n >= b
+           \
+
+    Calculo de complejidad.
+
+
+           /  Theta(n^{k})   si  a < b^k
+           | 
+    T(n) = |  Theta(log(n)*n^{k})   si  a = b^k
+           | 
+           \  Theta(n^{log_b(a)})   si  a > b^k
+
+Ejemplos:
+---------
+
+fib(n):
+   case
+	n <= 1 : 1
+	n >  1 : fib(n-1)+fib(n-2)
+   esac
+ 
+
+           /
+           | c0       si 0 <= n < 2
+    T(n) = |
+           | 2T(n-1) + c1  si n >= b
+           \
+
+   Complejidad :  Theta(2^{k-1})  , ya que a > 1 .
+
+Merge sort
+---------
+
+           /
+           | c   si 0 <= n1+n2 < 2
+    T(n) = |
+           | 2T(n/b) + c*n  si n >= b
+           \
+
+
+   Complejidad :  Theta(nlog(n)) ya que 2=a=b^k=2,  con a=b=2 , k=1
+
+
+
+Algunos complejidades conocidas, referencia
+------------------------------------------
+   - Binary search : Theta(log(n)) (a=1 , b=2, k=0)
+   - Mergesort : Binary search : Theta(nlog(n)) (a=b=2, k=1)
+   - Maximum   :  Theta(n)   (a=1)
+
+
+Ejemplos:
+--------
+
+1) Calcular el  maximo d un vector
+---------------------------------
+Maximum :  LINEAL
+
+
+Observa el diagrama:
+
+            0           n                 N
+	    +-...-+-----+-----+-----+-----+
+	    |     |  2  |  3  |  14 |  6  |
+	    +-...-+-----+-----+-----+-----+
+
+
+- FINAL.  (De derecha a izquierda)
+
+
+          // N > 0					                             
+	  fun maximum(V[0..N)) returns M : int		      
+	  {						      
+	     maximumG(V[0..N-1), V[N-1])			      
+	  }						      
+	  // M = max i : 0 <= i < M : V[i]		      
+	  						      
+	  						      
+	  						      
+	  // P : 0<=n<N , val = max i : n <= i < N : V[i]	      
+	  fun maximumG(V[0..n), val) return M :		      
+	  {						      
+	     case n==0 : p = val				      
+	     case n>0 :  p = maximumG(V[0..n-1),max(val,V[n-1]))  
+	  }						      
+	  // Q : M = max i : 0 <= i < N : V[i]                  
+
+Identifica patrones:
+--------------------
+C(n) : n
+
+B(n) : n==0
+NB(n) : n>0
+suc(n,val) : n-1,max(val,V[n-1])
+P(n)   :
+Q(n)   :
+
+
+
+- NO FINAL.  (De derecha a izquierda)
+
+
+          // N > 0					                             
+	  fun maximum(V[0..N)) returns M : int		      
+	  {						      
+	     maximumG(V[0..N))
+	  }						      
+	  // M = max i : 0 <= i < N : V[i]		      
+	  						      
+	  						      
+	  						      
+	  // P : 0<n<=N 
+	  fun maximumG(V[0..n)) return M :		      
+	  {						      
+	     case n==1 : M = V[0]
+	     case n>1 :  M = max(maximumG(V[0..n-1),V[n-1]))
+	  }						      
+	  // Q : M = max i : 0 <= i < n : V[i]                  
+
+

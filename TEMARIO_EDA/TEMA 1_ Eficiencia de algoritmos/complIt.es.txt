@@ -1,0 +1,225 @@
+* Definicion recursiva del lenguaje
+---------------------------------------
+(C Syntax-flavour se puede reducir)
+
+s ::=   skip | x := E | S1 ; S2
+        |  if B then S1 else S2
+        |  while B S1
+
+
+
+* Modos de hallar complejidad:- SOLO CASO PEOR -
+--------------------------------------
+    - Conteo elemental (Tema 1)
+    - Conteo Instrucción critica (Tema 1)
+    - Leyes Lenguaje-Ordenes Complejidad <===
+
+Objetivo:
+---------
+
+  - Eludir complicados calculos locales de conteo
+  - Usar la 
+
+
+ORDENES COMPLEJIDAD:
+--------------------
+
+
+--------------------      --------------------
+   x := E  , O(1) *              B , O(1) *
+
+
+* Elementales, basicas
+
+
+  S1 O(f1)  , S2 O(f1)    
+-----------------------   
+    S1;S2  O(max(f1,f2))  			  
+
+
+  B O(f3) , S1 O(f1) , S2 O(f2)		     
+--------------------------------------------------
+  if B then S1 else S2    O(max(O(f1),O(f2), O(f3))
+
+
+  f1 in O(F_it(n)) , f2 in O(F_{B,S}(n))
+---------------------------------		     
+   while B S ,  O(f1*f2)
+
+
+
+
+
+
+
+
+Ejemplo 1:
+-----------
+
+ j++ <=> j = j + 1  (C Syntax-flavour )
+
+
+      bool linSearch( int v[], int N, int x ) {
+        int j;
+        bool found;
+        
+        j = 0;
+        found = false;
+        while ( (j < N) && ! found ) {
+          found = ( v[j] == x );
+          j++;
+        }
+        return found;
+      }
+
+
+*  El programa es una secuencia
+
+     (S1; S2)
+
+     donde S1= (j = 0) y S2 el resto del programa.
+
+     - S1 O(1), (regla asignacion),
+     - Escogemos S2 (cualquier cosa es mayor que O(1)).
+
+**  De nuevo tenemos una secuencia, 
+
+     (S1; S2)
+
+     donde S1= (found = false) y S2 el resto del
+     programa.
+
+     - S1 O(1), (regla asignacion),
+     - Escogemos S2 (cualquier cosa es mayor que O(1)).
+
+
+***  Ahora tenemos un bucle, 
+
+      while (B)  S1 ,
+
+      donde B es "(j < num) && ! encontrado)" y S1
+       el cuerpo del buce,
+
+     - En CASO PEOR f1=(N-0+1), N a efectos asintoticos.
+     - B es O(1), (regla de expresion booleana)
+     - Escogemos S1 (cualquier cosa es mayor que O(1)).
+    
+**** Una secuencia (Cuerpo del bucle)
+
+     (S1; S2)
+
+     donde S1= (found = ( v[j] == x )) y S2 el resto del cuerpo bucle.
+
+     - S1 O(1) (por...), valoramos S2, (cualquier cosa es mayor que O(1)).
+     - Escogemos S2 (cualquier cosa es mayor que O(1)).
+
+***** Una asignacion
+
+          j= j + 1 ;
+	  
+      Esta en O(1), regla asignacion.
+
+**** Remontamos. La secuencia esta en O(1)
+
+*** Remontamos. En el bucle es
+   - f1=N y  F_{B,S}(N) in O(1).
+   - Luego, (while B S1)  es O(N*1), (regla while)
+
+** Remontamos . La secuencia es O(N)
+
+* Remontamos. El programa es complejdad O(N) lineal.
+
+
+
+Ejemplo 2:
+----------
+
+(An eye to C Syntax-flavour)
+
+i = 1 <=> Asignacion ANTES del bucle.
+i++   <=> i=i+1 despues del cuerpo 
+
+
+      void sortIns ( int v[], int N )
+      {
+        int i, j, x;
+        
+        for ( i = 1; i < N; i++ )
+	{
+          x = v[i];
+          j = i-1;
+          while ( (j >= 0 ) && (v[j] > x) )
+	  {
+            v[j+1] = v[j];
+            j = j-1;
+          }
+          v[j+1] = x;
+        }
+      }
+
+* El programa es una _secuencia_  (NO UN BUCLE !!)
+
+      (S1; S2)
+      
+  con S1 (i=1) y S2 el resto programa
+     - S1 O(1), (regla asignacion),
+     - Escogemos S2 (cualquier cosa es mayor que O(1)).
+
+
+**  S2 es un bucle (externo)
+
+       while B1 S1
+
+   B1 es (i<N) y S1 el cuerpo (incluyendo el bucle interno y
+                              i = i + 1)
+   
+    - f1=N-1 veces, (a efectos asintoticos N),
+    - Para hallar F_{B,S}(n))
+        - B1 es O(1)
+	- Escojemos S, (cualquier cosa mayor...) .
+
+***   Tenemos  una secuencia
+
+            S1;S2
+
+      donde S1 es x = v[i] y S2 el resto del cuerpo
+       - S1 O(1)
+       - Escogemos S2 (cualquier cosa es mayor que O(1)).
+
+****  Tenemos una secuencia (escondida!)
+
+      S1 ;  S2
+
+      donde j = i- 1 y S2 es el bucle interno.
+
+      - S1 O(1), regla asignacion.
+      - Escogemos S2 (cualquier cosa es mayor que O(1)).
+      
+
+***** Bucle Interno
+
+       while B1 S1
+
+      done B1 es "( (j >= 0 ) && ...)" y S1 el cuerpo bucle interno.
+       - B1 es O(1)
+       - Escogemos S1 (cualquier cosa es mayor que O(1)).
+         S1 es O(1) (por???)
+       - CUANTO ES f1 en caso peor? 
+           Depende del valor de i. i-1+1. (1,2,...N)
+	 
+         PUNTO :
+         -- El observador bucle externo ve una "_secuencia_"
+             1*S1 , 2*S1, ... (N-1)*S1, N*S1
+	 -- f1 in O(N). No es exacto decir f1=N, porque depende de i!!.
+     
+**** Remontamos, y la secuencia es O(N)
+
+*** Remontamos, y la secuencia es O(N)
+
+** Remontamos, y el bucle externo, 
+   - f1=N  (exactamente)
+   - F_{B,S}(n)) in O(N))
+
+   luego el bucle externo es O(N^2)
+
+* La complejidad del programa es O(N^2).

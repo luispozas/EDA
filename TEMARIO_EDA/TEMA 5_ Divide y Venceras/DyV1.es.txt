@@ -1,0 +1,42 @@
+Divide y Venceras: 
+===================
+
+Caso especial de recursion
+ - Tamaño _fracción? del original
+ - Subproblemas exclusivamente a partir del original
+ - Combinando subresultados con datos de entrada
+
+
+PLANTILLA
+---------
+
+   if base(x)
+        return sol_directa(x)
+   else
+      (x_1,...,x_k) = descomponer(x);
+      para cada x_1..x_k
+            y_i = dyv(x_i)
+      combinar(x,y_1,...y_k)
+
+Recurrencias
+-----------
+       /
+       |   c1 si n < n0
+T(n) = |
+       |   a*(T(n/b)) + c*n^k
+       \
+
+
+       /   O(n^k)   si a < b^k
+       |   
+T(n) = |   O(log(n)n^k)   si a = b^k
+       |   
+       \   O(n^log(b,a))  si a > b^k
+
+
+OBJETIVO:  B--, A--, k--
+---------
+
+Ejemplos ya vistos: binarySearch, mergeSort, quickSort
+
+

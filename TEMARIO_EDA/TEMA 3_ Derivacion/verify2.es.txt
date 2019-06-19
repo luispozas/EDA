@@ -1,0 +1,148 @@
+INTREPRETACION  DEL  INVARIANTE
+--------------------------------
+ - Es incorrecto suponer { I : x = k }
+ - x=0,1,2 _cambia_ a cada vuelta.
+ - Especulamos algo "invariante". 
+I : 0 <= x <= 2
+ (Volvemos a la demo hecha)
+
+
+
+ESTRATEGIAS DE DEMOSTRACION:
+---------------------------
+Si el programa es correcto, por lo general hay varias maneras de
+demostrar.
+
+??   { P } S1 ; S2 ; S3 { Q }
+
+  * (...)	             * (...)	              * (...)	          
+  * { P  } S1 { P ' }  	     * P => P'                * { P } S1;S2 {P'} 
+  * (...)	       	     * (...)	       	      * (...)	       	  
+  * { P' } S2;S3 { Q }	     * { P' } S1;S2 { Q' }    * { P' } S3  {Q'}	  
+  * { P } S1;S2;S3 {Q }	     * (...)		      * { P } S1;S2;S3 {Q'}
+                             * { Q' } S3  { Q }	      * (...)		  
+			     * { P } S1;S2;S3 {Q }    * Q => Q'            
+			                              * { P } S1;S2;S3 {Q }
+			     
+ESTRATEGIA "MARCHA ATRAS"
+-------------------------
+
+?? { P } S { Q }
+   - Predicado mas debil que cumple {pmd} S { Q }*
+   - P => pmd 
+
+
+* Informalmente:
+   - Minimo que pide S para llegar a Q
+   - Pago igual o mas.
+
+
+DEFINICION pmd : S x P -> P
+----------------------------
+
+pmd(skip,P)=P
+
+pmd(x=e,P)=P[x/e]
+
+pmd(S1;S2,P) = pmd(pmd(S2,P),S1)
+
+pmd(if B then S1 else S2,P )= B->pmd(P,S1) and not B -> pmd(P,S2)
+
+pmd(while B S1, Q) = .... (no hay "truco". 
+                          Es I, el invariante.
+			  Hay que _especularlo_  )
+
+
+
+PROGRAMAS ANOTADOS:
+-------------------
+  - Son programas con predicados entre sus sentencias.
+     Informal* : Son como los "andamios" del
+                 programador para construir con
+		 robustez los programas. (En C, existe <assert.h>)
+  - Claves para anotar:
+       - El foco es I 
+       - Siguiendo estrategia "MARCHA ATRAS"
+
+
+
+
+
+
+
+
+
+
+
+
+Ejemplo:
+--------
+{ P : N >= 0 }  S   { Q : x = sum i : 0 <= i < N : V[i] }
+
+Especulamos
+{ I : 0 <= n < N and x = sum i : n <= i < N : V[i]  }
+I es el centro del programa y C(n)=n
+
+     { P : N >= 0 }
+     {I3 : I2[n/N]}
+     n := N
+     {I2 : I[x/0]}
+     x := 0
+     {I}
+     while n > 0  { I and B }
+     	{I2[x/x + V[n-1]}
+        x = x + V[n-1]
+        {I2 :I[n/n-1]}
+	n = n - 1
+        {I}
+     done
+     { Q : x = sum i : 0 <= i < N : V[i] }
+
+
+   1 .  {I2 :I[n/n-1]}	n = n - 1   {I}  ASSGIN
+   2 . {I2[x/x + V[n-1]} x = x + V[n-1]   {I2 :I[n/n-1]} ASSIGN
+   3 . {I2 : I[x/0]}     x := 0     {I} ASSIGN
+   4 . {I3 : I2[n/N]} n := N {I2 : I[x/0]} ASSIGN
+   5 . {I2[x/x + V[n-1]} x = x + V[n-1]	n = n - 1 {I} SEQ(2,1)
+   6 . {I3 : I2[n/N]}   n := N ;   x := 0  {I}  SEQ(3,4)
+   7 .  { I and B } -> 	{I2[x/x + V[n-1]}  *
+   8 .  { I and B } x = x + V[n-1]	n = n - 1 {I} STREN(5,7)
+   9 .  { I and not B } -> Q  *
+   10.  {I}
+     while n > 0
+        x = x + V[n-1]
+	n = n - 1
+     done { Q }   WHILE(8,9)
+   11 .{I3 : I2[n/N]}
+        n := N
+        x := 0
+        while n > 0 
+          x = x + V[n-1]
+          n = n - 1
+         done
+       { Q }  SEQ(6,10)
+   12 . { P : N >= 0 } -> {I3 : I2[n/N]}  *
+   13. { P : N >= 0 }
+        n := N
+        x := 0
+        while n > 0 
+          x = x + V[n-1]
+          n = n - 1
+         done
+       { Q }  STREN(12,13)
+
+Corrección parcial.
+Hemos demostrado que "si acaba, acaba bien".
+
+
+Terminacion :  Veamos ahora que "acaba"
+
+
+   14 . { I and B } -> n >= 0   *
+   15 . { P3 : P2[n/n-1] } n = n - 1  { P2 : n < T } ASSIGN
+   16 . { P3[x/x+V[n-1] } x = x + V[n-1] { P3 }
+   17 . { P3[x/x+V[n-1] } x = x + V[n-1] ; n = n - 1  { P2 : n < T } SEQ(15,16)
+   18 . { I and B and n = T } -> { P3[x/x+V[n-1] }  *
+   19 . { I and B and n = T } x = x + V[n-1] ;  n = n - 1  { P2 : n < T } STREN(17,18)
+
+

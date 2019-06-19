@@ -1,0 +1,149 @@
+Sales Man Travel:
+-----------------
+Un viajante desea recorrer todas las ciudades, una única vez cada una,
+y regresar a la ciudad de partida. Las distancias (km) entre ciudades
+están marcadas por una matriz de adyacencia.
+
+De todos los posibles recorridos, el de
+menor distancia recorrida (menos gasolina consumida).
+
+Clásico de computabilidad (Optimización).
+
+(Tema de grafos orientados con coste)
+
+REPRESENTACION DE DATOS. Matriz
+de adyacencia.  Reservando INF cuando dos ciudades no están
+conectadas.
+
+distancias[N][N]
+
+N=3
+          0     1     2     3
+        0 +-----+-----+-----+
+	  |     |     |     |
+	1 +-----+-----+-----+
+	  |     |     |     |
+	2 +-----+-----+-----+
+	  |     |     |     |
+	3 +-----+-----+-----+
+
+
+Consiste en evaluar el mejor de los ciclos
+hamiltonianos en un grafo dado
+
+1- Solucion            [0..N)
+2- Condiciones explícitas  sol[i] in vertex.
+3- Condiciones implícitas
+     - \forall i : 0 <=  i < N : 1 = frec(sol[i],sol,0,N)
+        "Una vez por cada ciudad"
+     - \forall i : 0 <=  i < N : 1 = dist[i][(i+1)%N] != inf
+        "Ciudades comunicadas"
+     - sol[0]=0  
+       "ciudad de partida (arbritaria)"
+
+     3.1 Marcaje .
+           usada[0..N) de bool  
+     
+4-  Cuando es solucion
+       k == N-1 and dist[k-1][0]!= inf
+
+5 - Init main
+
+      sol[0]=1
+      used[0]=true
+      used[1..N) = false
+      coste=0
+      coste-mejor=inf
+      traveller(sol,1,dist,used,coste,solMejor,costeMejor)
+
+
+void traveller( int sol[],  int k,
+  	        int dist[N][N],
+		bool used[],
+		int &coste,
+		int solMejor[], int &costeMejor )
+{
+for(int i = 1; i < N; i++){
+    sol[k] = i;
+    if (esValida(dist,sol, k,used)){
+      coste += dist[sol[k-1]][sol[k]];
+      used[i]=true;
+	if(k==n-1){
+	  if (hayArista(dist,sol[k],sol[0]))
+			  if(coste +dist[k][0]< costeMejor)
+			  {
+			    costeMejor = coste+dist[k][0];
+			    copiarSol(sol, solMejor);
+			  }
+	}
+	else traveller(sol, k+1,
+	              dist,
+		      used,
+		      coste,
+		      solMejor, costeMejor);
+      used[i]=false;
+      coste -= dist[sol[k-1]][sol[k]];
+    }
+  }
+}
+
+
+Bag: (Mochila)
+--------------
+
+De un conjunto de objetos, de los que se sabe su peso w[i] y su
+valoración v[i], elaborar la selección de objetos que nos permita
+maximizar su valoración, con la restricción de un límite (W)
+
+W,w[i],v[i]>=0,
+
+1.- Solucion  '': sol[0..N)  maximo de objetos. <=============
+
+2.- Explicitas : sol[i] \in {0,1}  (or true,false) <==========
+[0,0,1,1,1]           [1,1,1,1]
+
+3.- Implicitas :
+         - P>=\sum i : 0 <= i < N : w[i]
+	 "Sin pasarse del limite"
+
+         3.1 marcaje
+	    ww=\sum i : 0 <= i < n : w[i]
+	    "Partial weight in bag"
+
+4.- Terminaci'on:
+        k = N-1
+
+5.- llamada inicial.
+    ww=k=0;
+    best-val=-INF
+    bag(sol,k,ww,value,best-sol,best-val)
+
+    (note: for the rest of parameters, we can take it as global constants)
+
+    void bag(int sol[],int k,
+             int ww,int value,
+	     int best-sol[],int &current-sol)
+    {
+       for(int i=0 ; i < 2 ; i++) // got it or not
+       {
+         sol[k]=i;
+	 if (ww+(i*w[k]) <= W)
+         {
+           value+=i*v[i]; //what is missing here?
+	   ww += i*w[i];
+	   if (k==N-1) {
+              if (value > best-val)
+              {
+                 current-sol=value;
+		 copy(best-sol,sol);
+              }
+           }
+           else
+              {
+                 bag(sol,k+1,ww,value,best-sol,best-val)
+              }
+           value-=i*v[i];
+	   ww -= i*w[i];
+       }
+    }
+}

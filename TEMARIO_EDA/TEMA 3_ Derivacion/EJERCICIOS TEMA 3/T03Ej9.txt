@@ -1,0 +1,78 @@
+Ejercicio 9 .
+------------
+ Verificar.
+
+    { x= X and y=Y and x > y >= 0 }
+    while (y > 0 )
+    {
+        z = x ;
+        x = y ;
+	y = z % y ;
+    }
+    { x = mcd(X,Y)  }
+
+
+Lo primero que hay que hacer es ANOTARLO.
+
+
+    {P: x= X and y=Y and x > y >= 0 }
+      { I } 
+    while (y > 0 )
+    {
+             { I[y/z%y][x/y][z/x] }	
+        z = x ;
+	     { I[y/z%y][x/y] }
+        x = y ;
+	     { I[y/z%y] }
+	y = z % y ;
+	     {I}
+    } { I and not B }
+    {Q: x = mcd(X,Y)  }
+
+
+2.- Articular la demostracion (Correccion parcial):
+
+
+I : mcd(x,y) = mcd(X,Y) and y >= 0
+B : y > 0
+
+Asignments
+
+  1:  { I[y/z%y] } y = z % y ; {I} ASSIGN
+  2:  { I[y/z%y][x/y] } x = y ; { I[y/z%y] } ASSIGN
+  3:  { I[y/z%y][x/y][z/x] } z = x ; { I[y/z%y][x/y] } ASSIGN
+
+While.
+
+  4: I:y>=0 and mcd(x,y)=mcd(X,Y) and notB:y = 0-> x = mcd(X,Y)
+  5: I:y>=0 and mcd(x,y)=mcd(X,Y) and B : y> 0 -> I[y/z%y][x/y][z/x]
+  7: {I} while(m<N)... {Q} WHILE(4,5)
+
+Sequentials
+
+  10: { I[y/z%y][x/y][z/x] } z = x ; x = y ; { I[y/z%y] } SEQ(2,3)
+  11: { I[y/z%y][x/y][z/x] } z = x ; x = y ; y=z%y { I } SEQ(1,10)
+
+Weak and Strong
+
+  12 : P -> I
+  13 :{P} while()...{Q} STREN(12,7)
+
+
+###########################################
+Solo son de interes 12,4 y 5
+
+
+?? P: x= X and y=Y and x > y >= 0 ->  mcd(x,y) = mcd(X,Y) and y >= 0
+
+Trivial.
+
+?? I:y>=0 and mcd(x,y)=mcd(X,Y) and notB:y = 0-> x = mcd(X,Y)
+
+Trivial.
+
+?? I:y>=0 and mcd(x,y)=mcd(X,Y) and B: y> 0 ->
+     I[y/z%y][x/y][z/x]:y>=0 and mcd(y,x%y)=mcd(X,Y)  (Ecuclides!)
+
+Not trivial.
+                                                

@@ -1,0 +1,134 @@
+INTRODUCCION:
+-------------
+
+* Programación recursiva ANTERIOR a la iterativa (1920..)
+* Teoria de funciones recursivas o computables (Alonzo-Church...)
+* Declarativa, matematica=>
+    * No hay noción de registro,(variable), asignaciones...
+    * Contador (secuencia)
+    * Bifurcacion y control de flujo(if while)
+* Es  más "expresiva", permite soluciones más sencillas
+* Mas ineficaz, emplea mas recursos de memoria.
+
+* Mas facil -> Problemas mas complejos para resolver.
+
+
+Ejemplo:
+--------
+
+{
+  P: n >= 0
+  Q: r=n!
+}
+fun factorial(n : int) dev r:int
+    n0,r=n,1
+    while n0 > 0
+       r=r*n0
+       n0=n0-1
+
+fun factorial(n : int) dev r:int
+   if n=0
+      r = 1
+   else
+      r = n*factorial(n-1)
+
+Nota: En el segundo, es un '=' ecuacional, no de asignacion!!!
+
+
+APROXIMACION OPERACIONAL
+------------------------
+* Hasta cierto punto la "simulamos" con C.
+* Que ocurre en un programa recursivo?
+
+(Aqui un dibujo en pizarra)
+
+
+
+
+
+SINTAXIS DE PSEUDO lENGUAJE:
+---------------------------
+Por si nos hace falta para hacer mas facil la notacion...
+(En el computador usamos C)
+
+ expr ::= 0 | e1 op e2 | id(e1,..en) |
+      case B1 -> e1  ... Bn -> en esac |
+      let
+         id1=e1 .... idn=en
+      in
+         e
+
+Ejemplo:
+--------
+     let
+        a=(5+7)/2
+	b=67
+     in
+        case (a>0)-> 5
+	     (a<=0) -> 5+b
+        
+
+Se puede "simular" con C (No es lo mismo!!)
+
+    a=(5+7)/2;
+    b=67;
+    return a>0?5:5+b
+
+    
+TIPOS DE RECURSION:
+-------------------
+
+* Lineal (Simple): Una sola llamada.
+	* Final (Tail). Sin computo despues de llamar
+	* No final.  Con Computo.
+
+* Multiple: (Varias llamadas)
+	* Num. Indep. de entrada (cuadratica,tres, cuatro llamadas)
+	* Depen. de entrada...
+   
+
+
+Ejemplos:
+---------
+       * Factorial (Lineal no final)
+       * Dicotomica (Lineal final)
+
+
+Esquema para funciones LINEALES:  Muy importante!!!
+----------------------------------------------------
+
+{ P(x) }
+fun foo(x) dev r:
+  case
+   B(x)
+     tv(x)
+   NB(X):
+     c(foo(suc(x)),x)
+{ Q(x) }
+
+foo(x0)
+
+x0 : valores de la llamdada inicial.
+x :  x1,...xn
+B : condicion del caso base
+NB : condicion del caso recursivo
+c : funcion de combinacion 
+suc:  datos de entrada de la llamada recursiva.
+tv : solucion caso trivial
+
+
+ESQUEMA DE CORECCIÓN:
+---------------------
+
+ P(x) and B(x) => Q(tv(x))
+ P(x) => B(x) or not B(x)
+ P(x) and NB(x) => P(suc(x))
+ Q(foo(suc(x))) and NB(x) => Q(c(foo(suc(x)),x)
+
+
+
+ P(x) and NB(x) => C(n) >= 0
+ P(x) and NB(x) C(n)=T => C(suc(x)))< T
+ 
+ 
+ 

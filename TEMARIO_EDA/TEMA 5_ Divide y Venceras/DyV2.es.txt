@@ -1,0 +1,77 @@
+Closest2D:
+----------
+Conjunto de puntos in R^2. Hallar la distancia mas pequeña entre dos
+de ellos.
+
+- Calculo distancia (n(n-1)/2) pares posibles... O(n^2)  zz!
+- En 1D, se podia hacer en O(nlog(n)), previamente ordenando los
+puntos.
+
+Es posible en 2D?  (Contraejemplos)
+
+
+
+
+Estrategia: Dibujo barra delta.
+
+
+
+
+
+
+
+
+
+Observaciones:
+
+  * Rectangulo (2 delta x delta ) contiene "a lo sumo" 8 puntos (4 + 4)
+  * En divisoria pueden coincidir 2 puntos mitad iz y 2 de mitad der.
+  * Nunca dos de la misma submitad distan menos de delta (hipotesis delta).
+  * Construimos este rectangulo sobre cada punto de la banda, empezando
+  desde los puntos inferiores a los superiores (ordenacion por Y)
+  * Como ordenar esta en O(nlog(n)), privativo, usamos tecnica de
+    parametros de salida
+
+
+
+Pseudocode:
+------------
+
+// P: 
+// j-i >= 2 , V x-sorted. (sorted on x...)
+// Q:
+// r = min p,q : i<=p < q <= j : dist(V[p],V[j])
+// A x-y sorted
+fun closest2d(V[i..j) of (int,int)  ) dev r real,
+                                          A vector of (int,int)
+case j-i=2:
+    r = dist(V[i],V[i+1])
+    A <- V[i..j) **
+    sort(A,\p1.\p2. p1.y <= p1.y) ; // this is lambda-abstraction.
+case j-i=3:  // why?
+    r = min(dist(V[i],V[i+1]),
+            dist(V[i+1],V[i]),
+	    dist(V[i],V[i+2]))
+    A <- V[i..j)  **
+    sort(A,\p1.\p2. p1.y <= p1.y)
+case (j-i)>3:
+     let 
+        h =(i+j)/2 ;
+	I = (A[h].x + A[h+1].x)/ 2
+        delta1,V1 = closest2d(A[i,h))
+        delta2,V2 = closest2d(A[h,j))
+	A = merge(V1,V2,\p1.\p2. p1.y <= p1.y)
+	B = filter(A,I,min(delta1,delta2),\p1.\d.\i. dist(i,p1) <= d)
+     in
+        case empty(B) : min(delta1,delta2)
+	else          : min(delta1,delta2,runBank(B))
+	   
+
+Planteamiento sobre la complejidad:
+----------------------------------
+sort O(1), merge, filter  y runBank O(n) se suponen implementadas.
+por qué?
+
+
+
+

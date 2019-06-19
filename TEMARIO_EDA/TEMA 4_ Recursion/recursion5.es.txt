@@ -1,0 +1,189 @@
+TECNICAS DE GENERALIZACION en FUNCIONES RECURSIVAS
+------------------------------------------------
+
+TEORIA: Pag 144. (Libro rojo Narciso).
+-----------------------------------
+
+{ P(x) }
+  fun fun(x : T1 ) dev ( y:T2)
+{ Q(x,y) }
+
+Generaliza a :
+
+{ P'(x,w) }
+  fun fun(x : T1 , w : T3 ) dev ( y:T2 , z: T4)
+{ Q'(x,y,w,z) }
+
+De tal modo que, bajo ciertas condiciones,
+
+P'(x,w) and R(x,w) and Q'(x,w,y,z) ->  Q(x,y)
+
+
+EJEMPLO CONCRETO:
+-------------------
+
+Vamos a entender con un ejemplo concreto:
+
+
+{ N >= O }
+fun suma_vector(X[0..N)) de ent dev s: ent
+{ s = sum i : 0 <= i < N : V[i] }
+
+
+GENERALIZACION A  NO FINAL: 
+-------------------------------------------------
+{ N >= O and 0<=n<= N}
+fun isuma_vector(X[0..n) de ent) dev s: ent
+{ s = sum i : n <= i < N : V[i] }   ** No necesito extra de salida.
+
+
+
+fun isuma_vector(X[0..n) de ent)
+   case (n==N):
+           0
+   case (n<N) :
+           V[n] + isuma_vector(X[0..n+1))
+
+
+La funcion es lineal? no lineal? final? no final?
+
+Llamada inicial:
+fun suma_vector(X) dev r
+  r=isuma_vector(X[0..0))
+
+
+GENERALIZACION A FINAL: 
+------------------------
+
+Intetemos ahora una final. (preferible, son mas simples)
+Debemos usar un parametro mas que acumule el resultado.
+
+{ N >= O and 0<=n<= N and ac = sum i : 0 <= i < n : V[i]}
+fun iisuma_vector(X[0..n) de ent, ac ent) dev s : ent
+   case (n==N):
+           ac
+   case (n<N) :
+           isuma_vector(X[0..n+1),ac+V[n])
+
+{ s = sum i : 0 <= i < N : V[i] }
+
+Nota: Lo que sigue aplica a no lineales tambien.
+
+Llamada inicial:
+
+fun suma_vector(X) dev r
+  r=isuma_vector(X[0..0),0)
+
+
+GENERALIZACION por RAZONES DE EFICIENCIA :
+------------------------------------------
+
+ - Inmersion por parametros-entrada: destinada a ahorar un
+  calculo ANTES de la llamada recursiva;
+ - Inmersion por parametros-salida: destinada a ahorar un
+  calculo DESPUES de la llamada recursiva;  
+
+
+Ejemplo para DESPUES de la llamada recursiva. 
+---------------------------------------------
+
+Dado V[0..N)  , N>1, (minimo dos elementos) , encuentre la distancia
+entre enteros mas lejanos.
+
+i.e
+
+V=[4,5,2,3,10,2,6]  -> |10 - 2| = 8
+V=[4,-1,-4,3,10,2,3]  -> |-4 - 10| = 4
+
+Algoritmo recursivo 
+
+{ 
+  P : N > 1 , V[0..N) 
+  Q : r = max p,q : 0 <= p < q < N : abs(A[p]-A[q])
+}
+fun maxDistance(A[0..N)) return r
+   r=maxDistanceG(A[0..N))
+
+
+V=[4,5,2,3,10,2,6]  -> |10 - 2| = 8
+
+
+
+
+0     inf               h                       sup   N
++-...-+-----+-----+-----+-----+-----+-----+-----+-...-+
+|     |  4  |  5  |  2  |  3  |  10 |  2  |  6  |     |
++-----+-----+-----+-----+-----+-----+-----+-----+-...-+
+          m1=2 M1=5              m2=2 M2=10
+
+
+Non final.
+------------
+
+{ 
+  P : 0<= sup , inf <= N , sup-inf > 1 , V[inf..sup) 
+  Q : r = max p,q : inf <= p < q < sup : abs(A[p]-A[q])
+}
+fun maxDistanceG(A[inf..sup)) return r
+   case (sup-inf==2)  // size 2
+         r=abs(A[inf]-A[sup-1])
+   case (sup-inf==3)  // size 3  why?
+                      // Becuase 3 splits into 2+1, and
+		      // P requires sup-inf > 1 !!!
+         M=max(A[inf],A[inf+1],A[inf+2])
+         m=min(A[inf],A[inf+1],A[inf+2])
+	 r=abs(M-m)
+   case (sup-inf > 3) // size > 3
+         let
+	    h = (inf+sup)/2
+	    r1 = maxDistanceG(A[inf..h))
+	    r2 = maxDistanceG(A[h..sup))
+	    max1,min1 = maxMin(A[inf..h))// O(n)
+	    max2,min2 = maxMin(A[h..sup)) // O(n)
+	 in
+	   r= max(r1,r2,abs(V[max1]-V[min2]),abs(V[min1]-V[max2])
+	 
+
+Segun la recurrencia, es como el mergeSort
+
+T(n) = T(n/2) + n , luego O(n log(n))
+
+Podemos bajar a O(n)?
+
+Y si....
+
+   Despues de llamar a la funcion, YA tuviese computados
+   los maximos y minimos ?
+       Deberia devolverselos al que me llamo.
+
+{ P : sup - inf > 1 }
+{ Q : r = max p,q : 0 <= p < q < N : abs(A[p]-A[q])
+      M = max i : inf <= i < sup : A[i]
+      m = min i : inf <= i < sup : A[i]  }
+fun maxDistanceG(in A[inf..sup)) dev r,M,m  <== look at that...
+   case (sup-inf==2)  // size 2
+         abs(A[inf]-A[sup-1]), max(A[inf],A[sup-1]),
+	                     min(A[inf],A[sup-1])
+   case (sup-inf==3)  
+         M=max(A[inf],A[inf+1],A[inf+2])
+         m=min(A[inf],A[inf+1],A[inf+2])
+         abs(M-m)
+   case (sup-inf > 3) // size > 3
+         let
+	    h = (inf+sup)/2
+	    r1,max1,min1 = maxDistance(A[inf..h))
+	    r2,max2,min2 = maxDistance(A[h..sup))
+	 in
+	    max(r1,r2,abs(max1-min2),abs(min1-max2),
+	    max(max1,max2)
+	    min(min1,min2)
+
+Cual es la nueva recurrencia?
+
+T(n) = T(n/2) + c , luego O(n)
+
+(No ganamos mucho con partir... Sustrayendo tambien conseguimos O(n)
+Era un caso didáctico)
+
+
+

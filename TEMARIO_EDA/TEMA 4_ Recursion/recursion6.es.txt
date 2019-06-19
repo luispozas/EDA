@@ -1,0 +1,108 @@
+Veamos el nuevo ejemplo:
+
+Computar la minima distancia entre dos elementos de un vector.
+
+P : N >= 2
+fun minDistance(V[0..N) of int) dev m
+Q : m = min p,q : 0 <= p, q < N and p!=q : |V[p]-V[q]|
+
+Implementación ingenua o naive en O(n^2)...
+
+
+Podemos bajar?
+
+P' : j-i >= 2  0<=i <j <= N
+fun minDistanceG(V[i..j) of int) dev m
+Q' : m = min p,q : i <= p, q <= j and p!=q : |V[p]-V[q]|
+
+
+Ideas previas
+-------------
+
+Recursivo:
+
++-----+-----+-----+-----+
+|  3  |  7  |   1 |   2 |   O(1) partir
++-----+-----+-----+-----+
+
+
++-----+-----+  +-----+-----+
+|  3  |   7 |  |  1  |  2  |  2T(N/2) + k
++-----+-----+  +-----+-----+
+
+Minimo entre las dos submitades (4,1) en O(N)
+
+Incorrecto: Contrajemplo
+
+Recursivo
+
++-----+-----+-----+-----+
+|  3  |  5  |  6  |  10 |   O(n) calc. maximo
++-----+-----+-----+-----+
+
+
++-----+-----+  +-----+-----+
+|  3  |   5 |  |  6  |  10 |  2T(N/2) + N 
++-----+-----+  +-----+-----+
+
+Vale!:
+minimo entre las dos submitades (2,4)
+y el maximo y minimo de los extremos (1)... O(n*log(n)) why
+
+
+Incorrecto: Contrajemplo
+
+Recursivo
+
+Caso rec.
+
++-----+-----+-----+-----+
+|  3  |  5  |   2 |   8 |
++-----+-----+-----+-----+
+
++-----+-----+-----+-----+
+|  2  |  3  |   5 |   8 |  sort O(nlog(n)) zzzz!
++-----+-----+-----+-----+
+
++-----+-----+  +-----+-----+
+|  2  |   3 |  |  5  |  8  |   2T(n/2) + nlog(n)
++-----+-----+  +-----+-----+
+
+
+Vale!:
+- minimo entre las dos submitades
+y el maximo y minimo de los extremos
+  HABIENDO ORDENADO ANTE EL VECTOR!
+
+Problema Omega(nlog^2(n)) 
+Podemos mejorar?
+
+Suponemos que esta ordenado "gratis" de entrada
+
+
+P' : j-i >= 2  0<=i <j <= N and permt(W,V) and sorted(W)
+fun minDistanceG(W[i..j) of int) dev m
+Q' : m = min p,q : i <= p, q <= j and p!=q : |W[p]-W[q]|
+
+  case j-i >= 2  : m = |W[i+1]-W[i]|
+  case j-i >= 3  : m = min(|W[i+1]-W[i]|,|W[i+2]-W[i+1]|)
+  e.o.c          :
+                   ml = minDistanceG(W[i..h)
+		   mr = minDistanceG(W[h..j)
+		   m = min(ml,mr,|W[h]-W[h-1])
+
+Complejidad O(N)
+
+
+Ahora, hay que hacer que no sea "gratis", pero fuera de la
+general
+
+fun minDistance(V[i..j) of int) dev m
+{
+   sort(V,W) ; // O(nlog(n)
+   m = minDistanceG(W[0..N)) // O(n)
+}
+
+Total : O(max(nlog(n),n))= O(n)
+
+

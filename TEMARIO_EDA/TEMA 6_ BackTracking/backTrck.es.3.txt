@@ -1,0 +1,142 @@
+Chess - Ajedrez
+---------------
+
+   0       1       2       3       4       5       6       7
+0  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   | (0,0) |       |       |       |       |       |       |       |
+   |       |       |       |       |       |       |       |       |
+1  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       |       |       |       | (1,4) |       |       |       |
+   |       |       |       |       |       |       |       |       |
+2  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       |       |       |       |       |       |       | (2,7) |
+   |       |       |       |       |       |       |       |       |
+3  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       |       |       |       |       | (3,5) |       |       |
+   |       |       |       |       |       |       |       |       |
+4  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       |       | (4,2) |       |       |       |       |       |
+   |       |       |       |       |       |       |       |       |
+5  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       |       |       |       |       |       | (5,6) |       |
+   |       |       |       |       |       |       |       |       |
+6  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       | (6,1) |       |       |       |       |       |       |
+   |       |       |       |       |       |       |       |       |
+7  +-------+-------+-------+-------+-------+-------+-------+-------+
+   |       |       |       |       |       |       |       |       |
+   |       |       |       | (7,3) |       |       |       |       |
+   |       |       |       |       |       |       |       |       |
+   +-------+-------+-------+-------+-------+-------+-------+-------+
+
+
+Ojo a la numeración!
+
+(7,3) es fila,columna (orden común en computación/alineacion memoria)
+ 
+    
+
+
+Problema: De cuantas maneras se pueden disponer 8 reinas en el tablero
+sin que ninguna sea atacada por las otras.
+
+
+ 1. Como planteo la solución .  sol
+
+Dado que la _naturaleza_ del problema impide dos reinas en una misma
+fila, podemos  implíctamente codificar la fila en el número de reina.
+
+
+La solución es entonces un vector de 8 (M) valores ( las columnas)
+
+ 2. Condiciones explicitas .   for
+
+  sol[i] in [0..8)
+
+ 3. Condiciones implicitas .   isvalid/completable
+
+   "Dos reinas no se alcanzan entre sí"
+
+ - En la misma fila.?
+        false. (Implicito, por qué?)
+ - En la misma columna?
+        sol[i]=sol[j]
+ - En la misma diagonal?
+      - ascendente:
+              observa la ley
+	         (3,1)~(4,2)
+		 (6,4)~(5,5)
+		 ...
+		 (i+col[i]==j+col[j])
+      - descendiente:
+             observa la ley
+	         (7,6)~(6,5)
+		 (1,1)~(2,2)
+		 ...
+		 i-col[i]==j-col[j]
+      - ascendente o descendente
+		 (i-col[i]==j-col[j]) or
+		 (i+col[i]==j+col[j])
+		 ....
+		 (i-j==col[i]-col[j]) or
+		 (i-j==col[j]-col[i])
+		 ...
+		 |i-j|==|col[j]-col[i]|
+
+    Es decir:
+
+==>  false || sol[i]=sol[j] || |i-j|==|col[j]-col[i]|
+
+   Computar esa expresion, fijada i, contra las n anteriores reinas,
+   lleva un coste de O(n)
+
+    3.1   Marcaje . Como podemos alcanzar O(1)?
+
+
+       (Ingenuo) Invertir en M[Q][Q] marcando casillas amenazadas
+           + La lectura seria O(1)
+	   + La escritura seria O(N)  :-(
+	   
+       (Dificil) Enumerar columas Q y diagonales.
+       
+           Mas infor en Capitulo 14 . Narciso et al.
+	   
+           + Columnas. facil
+	       C[0..Q) de bool
+	   + Diagonales. Enumerarlas
+	   
+	      (Mirar el dibujo a mano!)
+
+
+	        Asc.  [0..2Q-1)  con Q=8, de 0 a 14
+		Desc. [2Q-1..4Q-2)con Q=8,de 15 a 29
+
+               O sea D[0..4Q-2)
+
+
+       Ley (<i,j>) a Diagonal:
+            La casilla <i,j> (1,1) ocupa
+	        - diagonal descendente D[j-i+Q-1] (D[7])
+	        - diagonal ascendente  D[i+j+2Q-1](D[17])
+         
+
+4. Cuando es solucion.        esSolucion
+     k == Q - 1
+
+
+5. Iniciar valores.           main
+
+   k=0
+   for (c=0; c< Q; c++) C[c]=false
+   for (d=0; d< 4*Q; d++) D[d]=false
+   chess(sol,k,m)
+
+
+(Codigo completo en el CV, bajo problema C46)

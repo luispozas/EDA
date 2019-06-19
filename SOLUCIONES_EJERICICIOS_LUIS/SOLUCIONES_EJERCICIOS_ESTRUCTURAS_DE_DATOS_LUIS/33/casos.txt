@@ -1,0 +1,13 @@
+2
+LosIntrepidos PequalsNP 8 TLE
+EquipoA ElSolitario 30 AC
+JavaForever ElSolitario 30 RTE
+LosIntrepidos PequalsNP 100 AC
+LosIntrepidos Sumar2y2 101 AC
+Lentorros Sumar2y2 200 AC
+LosIntrepidos ElSolitario 210 WA
+B_team Horarios 220 WA
+FIN
+u1 p1 8 TLE
+u1 p1 20 AC
+FIN

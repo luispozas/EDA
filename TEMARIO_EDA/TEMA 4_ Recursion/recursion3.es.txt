@@ -1,0 +1,206 @@
+DOS ALGORITMOS DE ORDENACION IMPORTANTES
+-----------------------------------------
+
+- Beneficios de binSearch exigen vector ordenado
+- Enfoques sencillos: seleccion, burbuja...O(n^2)
+- 1960... Investigacion/competencia sobre ordenacion
+  	  - mergesort, quicksort, monticulo**
+
+- Responden a esquemas recursivos NO-LINEALES (2 llamadas):
+  	- implementacion facil en recursivo.
+	- nada trivial en iterativo (posible)
+ 
+	  
+
+RESUMEN
+
+
++---------+---------+--------+--------+-----------+
+|         |PARTICION| UNION  | MEMORIA|COMPLEJIDAD|
++---------+---------+--------+--------+-----------+
+|mergesort| facil   | dificil|disjunta|O(nlogn)   |
++---------+---------+--------+--------+-----------+
+|quicksort| dificil |facil   |in place|O(nlogn)** |
++---------+---------+--------+--------+-----------+
+
+
+** Ojo! Estudio estadistico. En caso peor, O(n^2)
+
+ESTRATEGIA: Generalizamos a SUBVECTORES...
+------------
+
+
+MERGESORT: (particion facil, union dificil, memoria disjunta)
+-----------------------------------------------------
+
+  * Intuicion:  [4, 1, 2, 5 ] 
+     1 - Parto el vector por la mitad
+         (Facil)
+         [ 4 , 1 ]    [ 2  , 5 ]
+     2 - Reordeno  por recursion (desordenadas entre si)
+         [ 1, 4 ]     [ 2 , 5 ]
+     3 - Mezclo las subpartes 
+        (Dificil)
+	 [ 1 , 2, 4, 5 ]
+
+
+       {						                   
+         P : j-i>=0 , V[i..j)				   
+         Q : C[i..j) and sorted(C) and permut(C,V)	   
+       }						   
+       proc mergeSort(V[i..j),C[ii..jj))		   
+         aux V1,V2;  <-- need extra memory		   
+         case j-i  <= 1 : C[ii..jj)=V[i..j)		   
+              j-i  > 1  :				   
+	              let h=size(V)/2		   
+       		          mergeSort(V[0..h),V1)	   
+       			  mergeSort(V[h..N),V2)	   
+       		      in			   
+       		          merge(V1,V2,C)	   
+         esac                                             
+
+
+
+La función merge ya se ha explicado en la parte de iterativos.
+
+
+        void merge(V1[0..N1),V2[0..N2),V3[0..N1+N2))  
+	{					      
+	  n=0;					      
+	  while (n < (N1 + N2))			      
+	     case				      
+	        n1 >= N1 :			      
+	                   V3[n]=V2[n2];	      
+		           n2 = n2 + 1 ;	      
+	        n2 >= N2 || V[n1]<=V[n2]: 	      
+			   V3[n]=V1[n1];	      
+			   n1 = n1 + 1 ;	      
+	        e.o.c    :			      
+			   V3[n]=V2[n2];	      
+			   n2 = n2 + 1 ;	      
+	     esac		     		      
+	     n=n+1				      
+	  done					      
+	}                                             
+
+
+QUICKSORT:
+-----------
+  * Intuicion: [ 4 , 1, 2, 5 ]
+    1 - Dos particiones respecto a un elemento pivote (4)
+        A la izquierda, menores que pivote, a la derecha mayores.
+	(Dificil)
+
+         [ 4, 1, 2 ]   y  [ 5 ]
+
+    2 - Es posible que no haya particion, i.e p=N,
+        y el tamaño no    decrezca. Por ejemplo.
+    
+         0                             p=N
+         +-----+-----+-----+-----+-----+
+	 |  4  |   4 |   4 |   4 |  4  |
+	 +-----+-----+-----+-----+-----+
+
+
+        luego conviene escindir en uno la partición de la izquierda.
+
+        Volviendo al ejemplo, i.e.,  intercambiar V[0] y V[p-1], ya
+         que p > 0 siempre.
+
+         [ 2 , 1 , 4 ]  y [5]   
+
+         Tenemos
+
+         [2 , 1 ]  , 4   , [5]
+
+    3 - Las particiones estan desordenadas. Las reordenamos (por rec)
+
+         [ 1 , 2 ] , 4,   [ 5 ]
+    
+    4 - Al terminar, ya tenemos un vector ordenado
+        (Facil)
+
+         [ 1, 2, 4, 5 ]
+
+
+Implementacion:
+
+            {						     
+	      P : N>=0 , V=A[0..N)				     
+	      Q : V=sorted(A)				     
+	    }						     
+	    proc quicksort(int/out V[0..N))			     
+	    {						     
+	       quicksortG(V[0..N))				     
+	    }						     
+	    						     
+	    						     
+	    { P : V[i..j) and N>=0 and 0<=i<=j<=N }		     
+	    { Q : sorted(V[i..j))				     
+	    // NOTA : in/out 				     
+	    proc quicksortG(int/out V[i..j))		     
+	    {						     
+	       case						     
+	          j-i<=1 : skip;				     
+	          j-i>1  :					     
+	                  partition(V[i..j),p)		     
+	    	      V[i],V[p-1] = V[p-1],V[i]  // why?     
+	    	      quicksort(V[i..p-1))		     
+	    	      quicksort(V[p..j))		     
+	       esac						     
+	    }                                                    
+
+
+(Partition ya se ha explicado en clase de  Iterativos.
+Otra versión. Esquema de paso largo y multiple restore/avance)
+
+
+            { 							  
+	      P : V[i..j) N>=0 , 0<=i<=j<=N }			  
+	      Q : V[i..p)<=V[p]  and p<V[p..j) 			  
+	      // i.e AllessLessEq(V,i,p,V[p]) and AllessGt(V,p,j,V[p])
+	    }							  
+	    proc partition(in/out V[i..j),out p)			  
+	    {							  
+	        p = i						  
+	        while i < j						  
+	           a=i;						  
+	           while a<j and v[a]<=V[p] : a = a + 1		  
+	           b=j;						  
+	           while a<b and v[b-1]>V[p] : b = b - 1		  
+	           case (b-a)==(j-i) // We have two swap		  
+	               V[a],V[b] = V[b],V[a]
+		       i,j = i+1, j-1
+		   e.o.c
+	               i,j = a, b
+	        p = i						  
+	    }                                                         
+    
+
+Ilustracion del invariante: (Al principio)
+
+p=i                                      j
++---+---+---+---+--....--+---+---+---+---+
+|4  | 3 | 1 | 5 |        | 0 | 5 | 7 | 10|
++---+---+---+---+--....--+---+---+---+---+
+
+
+
+Ilustracion del invariante: (Durante)
+
+p               i        j            
++---+---+---+---+--....--+---+---+---+---+
+|4  | 3 | 1 | 0 |        | 5 | 5 | 7 | 10|
++---+---+---+---+--....--+---+---+---+---+
+
+
+Ilustracion del invariante: (Al final)
+
+p                    i=j   
++---+---+---+---+----+--...-+---+---+---+---+
+|4  | 3 | 1 | 0 | 2  |      | 5 | 5 | 7 | 10|
++---+---+---+---+----+--...-+---+---+---+---+
+
+
+
+

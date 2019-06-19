@@ -1,0 +1,76 @@
+Ejercicio 8 .
+------------
+ Verificar.
+
+    { x= X and y=Y and Y >= 0 }
+    p = 1
+    while (y > 0 )
+    {
+       p = p*x;
+       y = y-1
+    }
+    { p=X^Y }
+
+
+Lo primero que hay que hacer es ANOTARLO.
+
+
+    {P: x= X and y=Y and Y >= 0 }
+    { I[p/1]}
+    p= 1 { I }
+    while (y > 0 )
+    {
+        { I[y/y-1][p/p*x]}
+       p = p*x;
+         { I[y/y-1]}
+       y = y-1
+       	 { I }
+    }  { I and y = 0 }
+    {Q: p=X^Y }
+
+
+2.- Articular la demostracion (Correccion parcial):
+
+
+I : p=X^(Y-y) and 0<=y<=Y
+B : y > 0
+
+Asignments
+
+  1:  { I[y/y-1]} y = y-1 { I } ASSIGN
+  2:  { I[y/y-1][p/p*x]} p = p*x; { I[y/y-1]} ASSIGN
+  3 : { I[p/1]} p= 1 { I }
+
+
+While.
+
+  4: I:p=X^(Y-y) and 0<=y<=Y and notB:y = 0-> p=X^Y
+  5: I:p=X^(Y-y) and 0<=y<=Y and B : y> 0 ->  I[y/y-1][p/p*x]
+  6: I -> I
+  7: {I} while(m<N)... {Q} WHILE(4,5,6)
+
+Sequentials
+  8:  { I[y/y-1][p/p*x]} p = p*x; y = y-1 { I } SEQ(1,2)
+  9:  { I[p/1]} p= 1 ;  while (B)  { I } SEQ(3,7)
+
+Weak and Strong
+
+  10 : P -> I[p/1]
+  11 :{P} while()...{Q} STREN(8,6)
+
+
+###########################################
+Solo son de interes 4,5 y 10
+
+
+?? I:p=X^(Y-y) and 0<=y<=Y and notB:y = 0-> p=X^Y
+
+Trivial.
+
+?? I:p=X^(Y-y) and 0<=y<=Y and B : y> 0 ->  I[y/y-1][p/p*x]
+
+Trivial.
+
+?? x= X and y=Y and Y >= 0 -> 1=X^(Y-y) and 0<=y<=Y
+    
+                                                

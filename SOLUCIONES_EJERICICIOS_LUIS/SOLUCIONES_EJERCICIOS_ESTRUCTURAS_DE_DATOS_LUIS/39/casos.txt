@@ -1,0 +1,236 @@
+6
+nuevoLibro 10 Libro6
+comprar Libro6
+comprar Libro6
+comprar Libro6
+elimLibro Libro6
+top10
+6
+nuevoLibro 10 Libro3
+elimLibro Libro3
+numEjemplares Libro3
+comprar Libro3
+elimLibro Libro3
+top10
+110
+nuevoLibro 10 Libro0
+nuevoLibro 10 Libro1
+nuevoLibro 10 Libro2
+nuevoLibro 10 Libro3
+nuevoLibro 10 Libro4
+nuevoLibro 10 Libro5
+nuevoLibro 10 Libro6
+nuevoLibro 10 Libro7
+nuevoLibro 10 Libro8
+nuevoLibro 10 Libro9
+comprar Libro9
+numEjemplares Libro8
+elimLibro Libro2
+comprar Libro8
+numEjemplares Libro9
+comprar Libro5
+comprar Libro2
+top10
+numEjemplares Libro7
+comprar Libro0
+elimLibro Libro3
+comprar Libro9
+numEjemplares Libro0
+top10
+top10
+comprar Libro6
+comprar Libro7
+comprar Libro2
+comprar Libro0
+top10
+comprar Libro9
+top10
+top10
+comprar Libro2
+comprar Libro6
+numEjemplares Libro5
+comprar Libro1
+comprar Libro7
+numEjemplares Libro3
+elimLibro Libro4
+elimLibro Libro0
+comprar Libro6
+comprar Libro3
+elimLibro Libro6
+top10
+comprar Libro1
+comprar Libro7
+comprar Libro8
+comprar Libro8
+comprar Libro5
+comprar Libro5
+elimLibro Libro3
+comprar Libro5
+numEjemplares Libro5
+elimLibro Libro9
+comprar Libro7
+numEjemplares Libro5
+comprar Libro1
+comprar Libro8
+numEjemplares Libro5
+elimLibro Libro2
+comprar Libro6
+top10
+comprar Libro4
+top10
+top10
+numEjemplares Libro8
+numEjemplares Libro8
+comprar Libro7
+comprar Libro4
+numEjemplares Libro1
+numEjemplares Libro5
+top10
+comprar Libro2
+comprar Libro8
+comprar Libro0
+comprar Libro4
+elimLibro Libro5
+comprar Libro3
+elimLibro Libro6
+comprar Libro2
+comprar Libro2
+elimLibro Libro7
+top10
+top10
+elimLibro Libro1
+numEjemplares Libro0
+top10
+comprar Libro7
+elimLibro Libro0
+comprar Libro9
+numEjemplares Libro6
+comprar Libro8
+top10
+top10
+comprar Libro3
+comprar Libro0
+comprar Libro6
+top10
+comprar Libro3
+comprar Libro8
+elimLibro Libro0
+comprar Libro6
+elimLibro Libro6
+comprar Libro3
+comprar Libro4
+elimLibro Libro0
+top10
+comprar Libro7
+comprar Libro7
+14
+nuevoLibro 10 Libro0
+nuevoLibro 10 Libro1
+nuevoLibro 10 Libro2
+nuevoLibro 10 Libro3
+nuevoLibro 10 Libro4
+nuevoLibro 10 Libro5
+nuevoLibro 10 Libro6
+nuevoLibro 10 Libro7
+nuevoLibro 10 Libro8
+nuevoLibro 10 Libro9
+comprar Libro9
+numEjemplares Libro8
+elimLibro Libro2
+numEjemplares Libro2
+5
+nuevoLibro 20 Heidi
+nuevoLibro 30 Caperucita roja
+comprar Heidi
+numEjemplares Caperucita roja
+top10
+64
+nuevoLibro 20 Heidi
+nuevoLibro 19 a1
+nuevoLibro 18 a2
+nuevoLibro 30 a3
+nuevoLibro 30 a4
+nuevoLibro 30 a5
+nuevoLibro 30 a6
+nuevoLibro 0 a6
+nuevoLibro 50 a6
+nuevoLibro 30 a7
+nuevoLibro 30 a8
+nuevoLibro 30 a9
+nuevoLibro 30 a10
+nuevoLibro 30 a11
+nuevoLibro 30 a12
+comprar Heidi
+comprar Heidi
+comprar Heidi
+comprar a1
+comprar a1
+comprar a2
+comprar a2
+comprar a2
+comprar a2
+comprar a2
+comprar a2
+comprar a3
+comprar a4
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+comprar a5
+numEjemplares a6
+comprar a6
+comprar a5
+comprar a7
+comprar a7
+comprar a8
+comprar a9
+comprar a10
+comprar a10
+comprar a10
+comprar a10
+comprar a10
+comprar a10
+comprar a10
+comprar a10
+comprar a11
+comprar a12
+comprar a12
+comprar a12
+numEjemplares Heidi
+numEjemplares Caperucita roja
+numEjemplares a10
+elimLibro a10
+top10
+comprar Caperucita roja
+comprar Caperucita roja
+nuevoLibro 50 Rey leon
+comprar Rey leon
+elimLibro Heidi
+top10
+nuevoLibro 50 Tortugas
+comprar Tortugas
+top10
+elimLibro Caperucita roja
+elimLibro Rey leon
+elimLibro Tortugas
+top10
+numEjemplares Heidi
+numEjemplares Caperucita roja
+numEjemplares Rey leon
+numEjemplares a10
+numEjemplares a1
+8
+nuevoLibro 1 La vuelta al mundo en 80 dias
+comprar La vuelta al mundo en 80 dias
+estaLibro La vuelta al mundo en 80 dias
+nuevoLibro 5 Viaje al centro de la tierra
+comprar Viaje al centro de la tierra
+comprar Viaje al centro de la tierra
+top10
+comprar La isla misteriosa

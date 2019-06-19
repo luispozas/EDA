@@ -1,0 +1,207 @@
+SELECTION PROBLEM  (nth)
+------------------------
+
+
+Dado un vector desordenado, nos preguntamos :
+
+-el n-ésimo valor si estuviera ordenado...
+
+0 1 12 13 14 15 6 7 8 9 10 11 2 3 4 5
+
+El 2º elemento sería el 2
+
+-1 -3 8 7 6 2 1 1 10 4 5 18  4 30 2 0
+
+El 8 elemento sería el 4
+
+Complejidad?   Ordenar previamente sería en O(nlog(n))...
+
+VAMOS  INTENTARLO EN O(N)
+
+APUNTES SOBRE CALCULABILIDAD Y COMPLEJIDAD:
+----------------------------------------
+
+P1 es reducible en tiempo polinomial a  P2 (P1->P2) si
+
+cuando puedo resolver P2 en polinomial, puedo resolver P1 en polinomial.
+
+
+Ejemplo  1 : Particion a 3 se puede reducir a Particion a 2 en polinomial.
+
+
++------------------+-----+
+|     <=           |  >  |    O(N)
++------------------+-----+
+
+
++------------+-----+-----+
+|      <     |  =  |  >  |    O(N)
++------------+-----+-----+
+
+
+(Primero parto respecto a <= y despues respecto a =)
+
+Ejemplo 3 : Mediana se puede reducir a selección.
+
+mediana(V[0..N) ->   nth(V[0..N),N/2)
+
+
+IDEA GENERAL: En vez de _ordenar_ O(nlogn) vamos a _partir_ V O(n)
+
+// P : 0 <= i < j <= N , N>0  0 <= s < N and A[i]<=A[s]<=A[j]
+// Q : A[s]
+// (donde permut(A,V) and sorted(A)
+nth(V[i..j),s)
+
+case j-i = 1
+   dev V[i]
+e.o.c
+   p<-mediana(V[i..j))/ 1. mediana->sort? O(nlogn) 2. mediana->nth (X)
+   particion3(V[i..j),k,l)  O(n)
+   case k <= s <= l -> dev p
+   case s <= k       -> dev nth(V[i..k),s)
+   case l <= s       -> dev nth(V[l..j),s)
+
+
+
+i                                                           j
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|     |     |     |     |     |     |     |     |     |     |
++-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+                        | (Particion respecto a p)
+
+i          k                    l                           j
++----------+--------------------+---------------------------+
+|    <     |        =           |         >                 |
++----------+--------------------+---------------------------+
+
+
+
+Probemos una valor facil de computar para pivote
+// P : 0 <= i < j <= N , N>0  0 <= s < N and A[i]<=A[s]<=A[j]
+// Q : n= A[s]
+// (donde permut(A,V) and sorted(A)
+
+case j-i = 1
+   dev V[i]
+e.o.c
+   p<- T[i] // O(1)
+   particion3(V[i..j),k,l)  // O(n)
+   case k <= s <= l -> dev p
+   case s <= k       -> dev nth(V[i..k),s)
+   case l <= s       -> dev nth(V[l..j),s)
+
+
+El problema es que es posible que particion3 en el caso pero quede
+
+0                        N-1   N
++------------------------+-----+
+|                        |     |
++------------------------+-----+
+
+y no divida, sino que sustraiga  -> O(N^2)
+
+
++-----------+--------+----------+---------+
+|   piv     |  partir| cost. lat| Recurr  |
++-----------+--------+----------+---------+
+| med->sort |  T(n/2)|  nlogn?  | Om(nlgn)|
++-----------+--------+----------+---------+
+| p<-T[i]   | T(n-1) |  n       | O(n^2)  |
++-----------+--------+----------+---------+
+|pseudo-med | T(n/2) |  n/5     | O(n/5)  |  <=======
++-----------+--------+----------+---------+
+
+
+CALCULEMOS LA PSEUDOMEDIANA como valor pivote
+
+// P : 0 <= i < j <= N , N>0  0 <= s < N and A[i]<=A[s]<=A[j]
+// Q : n= A[s]
+// (donde permut(A,V) and sorted(A)
+nth(V[i..j),s)
+case j-i = 1
+   dev V[i]
+e.o.c
+   p<- pseudomediana(V[i..j))   <-- O(N/5) !
+   particion3(V[i..j),k,l)  O(n)    O(N)
+   case k <= s <= l -> dev p
+   case s <= k       -> dev nth(V[i..k),s)
+   case l <= s       -> dev nth(V[l..j),s)
+
+
+donde pseudomediana es
+
+  pseudomediana(V[i..j))
+   case j-i <= 5
+        dev medianaReal(V[i..j) // O(1)
+   e.o.c
+        z <- (j-i)/5
+	Z[0..z)
+	for (i=0; i < z ; i++)  Z[i]<-medianaReal(V[5i..5(i+1)))
+	dev nth(Z[0..z],z/2) <====== T[N/5] !!!!
+
+Veamos con un ejemplo como es de buena la "particion"?
+
+
+0                   5                   10                  15
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+| 1 | 5 | 2 | 28| 33| 5 | 16| 4 | 23| 8 | 25| 30| 27| 51| 3 |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+
+0                   5                   10                  15
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+| 1 | 2 | 5 | 28| 33| 4 | 5 | 8 | 16| 23| 3 | 25| 27| 30| 51|  O(k*n/5)=O(n)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+          |                   |                   |
+	  |		      |			  |
+	  |		      |			  |
+0         |         1         |         2         |         3
++-------------------+-------------------+-------------------+
+|         5         |         8         |         27        |   T[n/5]
++-------------------+-------------------+-------------------+
+
+
+p <- 8 ,  ya que mediana(T[0..3])=nth(T[0..3],2)
+
+Vemos que la pseudo mediana deja, al menos, a la izquierda, (resp.der)
+
+  1,2,5,4,5,  <= 8      (  8 < 16,23,27,30,51)
+
+es decir
+
+  3*((n/5)/2)=3*n/10 a su izquierda <= y 7*n/10 a la derecha >
+  3*((n/5)/2)=3*n/10 a su derecha   >= y 7*n/10 a la izquierda<
+
+
+                |
+		|
+		|
+	3*n/10	|                 7*n/10
+0  <----------->=<------------------------------------------>
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|   |   |   |   | p | p | p |  p|  p| p | p |   |   |   |   |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+<------------------------------------------>=<-------------->
+	7*n/10				    |    3*n/10
+					    |
+					    |
+					    |
+En el caso particular
+
+
+0                       k   l                               N
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+| 1 | 2 | 5 | 4 | 5 | 3 | 8 | 16| 23| 27| 30| 51| 28| 33| 25|
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+
+Esto hace que la recurrencia sea
+
+    T(N) <= dN + T[N/5] + max { t(M) | M <= 7*N/10 }
+
+No vale la Regla de Recurrencia clásica. Pero por inducción se
+demuestra que
+
+     T(N) \in O(N)

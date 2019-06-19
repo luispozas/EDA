@@ -1,0 +1,47 @@
+CRITICAL INSTRUCTION 
+---------------------
+
+The critical instruction is the one most executed
+inside an algorithm. Hence, it determines complexity.
+
+
+Sample
+------
+
+n = 0
+while n< N
+   t = n + 1
+   while t < N && V[t]!=0
+       t = t + 1
+   done
+   n=t
+done
+
+
+Applying  Order Complexity calculus, we get O(N^2)
+
+This is sound, but inaccurate: let's see how manty times it is
+executed the critical instruction:
+
+A closer look into the _surrounding_code unveils the next development.
+
+t1-t0+1 : times for 1st
+t2-t1+1 : times for 2nd  
+t3-t2+1 : times for 3rd
+...
+t_{n}-t{n-1}+1: times for Nth
+
+Let t0 initial value of t in the first loop. t1 its final value.
+t2 the final value on the second loop... then
+
+(t1-(t0-1)+(t2-(t1-1))+(t3-(t2-1))+....+(t_{n-1}-(t_{n-2}-1))+(t_{n}-(t_{n-1}-1))=
+
+t0=1
+t_{n}=N
+
+1 + 1 + 1 + ...+ N <= 2N \in O(N)
+
+Despite the two loops, the algorithm is linear!
+
+
+

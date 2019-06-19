@@ -1,0 +1,52 @@
+Optimización de búsqueda:
+---------------------------
+
+- Buscamos la mejor solucion, con respecto a un _criterio_
+- Posibilidad de poda. Estimación de la mejor solución (NO ENTRA)
+
+Importante! Al menos debe existir una! O...
+
+(Solución flag)  !init -> M = max : : ...
+
+
+Esquema general optimizacion (con marcadores)
+---------------------------------------------
+
+Elementos nuevos:
+
+A. Parametros
+  - mejor sol, mejor valor (de salida)
+  - actual valor. (marcaje)
+
+B. Una función de valoración/comparación.
+  - mejor(valor, valor-mejor)
+
+
+NOTA: En el siguiente esquema
+          true**
+indica en cursos superiores esta funcion se considera
+un _estimador_ del valor.
+	 
+proc backTracking(sol : tupla, k : nat,
+                  m: marcador, 
+                  valor: int,   <====
+		  mejor-sol : tupla, mejor-val : int)<===
+   preparar-recorrido-nivel(k)
+   while not ultimo-nivel(k) do
+      sol[k] = siguiente-hijo-nivel(k)
+      si es-valida(sol,k,m) 
+         valor := actualizar(valor, sol, k) <=== ojo!
+         m = marcar(m,sol[k])  
+         si es-solucion(sol,k) then
+           si mejor(valor,mejor-val) entonces
+	     sol-mejor := sol;  <====
+	     valor-mejor := valor; <====
+	   fsi
+         si no
+	     if completable(sol,k,m) and true**
+	        backTracking(sol, k+1)
+	 fsi
+	 m := desmarcar(m,sol[k])  
+         valor := desactualizar(valor, sol, k) <== ojo! 
+     fsi
+   done
